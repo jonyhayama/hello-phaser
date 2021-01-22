@@ -10,6 +10,7 @@ export default class MainScene extends Phaser.Scene {
     super('main-scene')
 
     this.player = undefined;
+    this.cursors = undefined;
   }
 
   preload() {
@@ -28,8 +29,29 @@ export default class MainScene extends Phaser.Scene {
     this.add.image(400, 300, 'sky');
     this.add.image(400, 300, 'star');
 
-    this.createPlatforms();
-    this.createPlayer();
+    const platforms = this.createPlatforms();
+    this.player = this.createPlayer();
+
+    this.physics.add.collider(this.player, platforms);
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+  }
+
+  update() {
+    if( this.cursors.left.isDown ){
+      this.player.setVelocityX(-160);
+      this.player.anims.play('left', true);
+    } else if ( this.cursors.right.isDown ){
+      this.player.setVelocityX(160);
+      this.player.anims.play('right', true);
+    } else {
+      this.player.setVelocityX(0);
+      this.player.anims.play('turn');
+    }
+    
+    if( this.cursors.up.isDown && this.player.body.touching.down ){
+      this.player.setVelocityY(-330);
+    }
   }
 
   createPlatforms(){
@@ -40,12 +62,14 @@ export default class MainScene extends Phaser.Scene {
     platforms.create(600, 400, KEYS.GROUND);
     platforms.create(50, 250, KEYS.GROUND);
     platforms.create(750, 220, KEYS.GROUND);
+
+    return platforms;
   }
 
   createPlayer(){
-    this.player = this.physics.add.sprite(100, 450, KEYS.DUDE)
-		this.player.setBounce(0.2)
-		this.player.setCollideWorldBounds(true)
+    const player = this.physics.add.sprite(100, 450, KEYS.DUDE)
+		player.setBounce(0.2)
+		player.setCollideWorldBounds(true)
 
 		this.anims.create({
 			key: 'left',
@@ -65,6 +89,8 @@ export default class MainScene extends Phaser.Scene {
 			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 5, end: 8 }),
 			frameRate: 10,
 			repeat: -1
-		})
+    })
+    
+    return player;
   }
 }
