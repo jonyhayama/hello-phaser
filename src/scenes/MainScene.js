@@ -1,10 +1,12 @@
 import Phaser from 'phaser'
 import ScoreLabel from '../ui/ScoreLabel'
+import BombSpawner from './BombSpawner'
 
 const KEYS = {
   GROUND: 'ground',
   DUDE: 'dude',
-  STAR: 'star'
+  STAR: 'star',
+  BOMB: 'bomb'
 }
 
 export default class MainScene extends Phaser.Scene {
@@ -14,10 +16,12 @@ export default class MainScene extends Phaser.Scene {
     this.player = undefined;
     this.cursors = undefined;
     this.scoreLabel = undefined;
+    this.stars = undefined
+    this.bombSpawner = undefined;
   }
 
   preload() {
-    this.load.image('bomb', 'assets/img/bomb.png');
+    this.load.image(KEYS.BOMB, 'assets/img/bomb.png');
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
     this.load.image(KEYS.STAR, 'assets/img/star.png');
@@ -33,14 +37,18 @@ export default class MainScene extends Phaser.Scene {
 
     const platforms = this.createPlatforms();
     this.player = this.createPlayer();
-    const stars = this.createStars();
+    this.stars = this.createStars();
 
     this.scoreLabel = this.createScoreLabel(16, 16, 8);
 
-    this.physics.add.collider(this.player, platforms);
-    this.physics.add.collider(stars, platforms);
+    this.bombSpawner = new BombSpawner(this, KEYS.BOMB);
+    const bombGroup = this.bombSpawner.group;
 
-    this.physics.add.overlap(this.player, stars, this.collectStar, null, this)
+    this.physics.add.collider(this.player, platforms);
+    this.physics.add.collider(this.stars, platforms);
+    this.physics.add.collider(bombGroup, platforms);
+
+    this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this)
 
     this.cursors = this.input.keyboard.createCursorKeys();
   }
@@ -132,5 +140,14 @@ export default class MainScene extends Phaser.Scene {
   collectStar(player, star){
     star.disableBody(true, true);
     this.scoreLabel.add(10);
+
+    if( this.stars.countActive(true) === 0 ){
+      //  A new batch of stars to collect
+			this.stars.children.iterate((child) => {
+				child.enableBody(true, child.x, 0, true, true)
+			});
+    }
+
+    this.bombSpawner.spawn(player.x)
   }
 }
