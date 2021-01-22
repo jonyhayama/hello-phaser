@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import ScoreLabel from '../ui/ScoreLabel'
 
 const KEYS = {
   GROUND: 'ground',
@@ -12,6 +13,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.player = undefined;
     this.cursors = undefined;
+    this.scoreLabel = undefined;
   }
 
   preload() {
@@ -32,6 +34,8 @@ export default class MainScene extends Phaser.Scene {
     const platforms = this.createPlatforms();
     this.player = this.createPlayer();
     const stars = this.createStars();
+
+    this.scoreLabel = this.createScoreLabel(16, 16, 8);
 
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(stars, platforms);
@@ -98,6 +102,15 @@ export default class MainScene extends Phaser.Scene {
     return player;
   }
 
+  createScoreLabel( x, y, score ){
+    const style = { fontSize: '32px', fill: '#000' }
+    const label = new ScoreLabel( this, x, y, score, style );
+
+    this.add.existing(label);
+
+    return label;
+  }
+
   createStars(){
     const stars = this.physics.add.group({
       key: KEYS.STAR,
@@ -118,5 +131,6 @@ export default class MainScene extends Phaser.Scene {
 
   collectStar(player, star){
     star.disableBody(true, true);
+    this.scoreLabel.add(10);
   }
 }
