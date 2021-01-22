@@ -18,6 +18,8 @@ export default class MainScene extends Phaser.Scene {
     this.scoreLabel = undefined;
     this.stars = undefined
     this.bombSpawner = undefined;
+    
+    this.gameOver = false;
   }
 
   preload() {
@@ -47,13 +49,18 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(this.stars, platforms);
     this.physics.add.collider(bombGroup, platforms);
+    this.physics.add.collider(this.player, bombGroup, this.hitBomb, null, this);
 
-    this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this)
+    this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
 
     this.cursors = this.input.keyboard.createCursorKeys();
   }
 
   update() {
+    if( this.gameOver ){
+      return;
+    }
+    
     if( this.cursors.left.isDown ){
       this.player.setVelocityX(-160);
       this.player.anims.play('left', true);
@@ -149,5 +156,12 @@ export default class MainScene extends Phaser.Scene {
     }
 
     this.bombSpawner.spawn(player.x)
+  }
+
+  hitBomb(player, star){
+    this.physics.pause();
+    player.setTint(0xff0000);
+    player.anims.play('turn');
+    this.gameOver = true;
   }
 }
