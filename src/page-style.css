@@ -31,3 +31,15 @@ body {
   margin-bottom: 0.75rem;
   margin-top: 0rem;
 }
+
+.credits ul {
+  margin: 0;
+  padding: 0;
+}
+
+.credits li {
+  list-style: none;
+}
+.credits li:before {
+  content: '- ';
+}
