@@ -18,6 +18,8 @@ export default class MainScene extends Phaser.Scene {
     this.scoreLabel = undefined;
     this.stars = undefined
     this.bombSpawner = undefined;
+    this.currentScore = 0;
+    this.hiScore = 0;
     
     this.gameOver = false;
   }
@@ -41,7 +43,8 @@ export default class MainScene extends Phaser.Scene {
     this.player = this.createPlayer();
     this.stars = this.createStars();
 
-    this.scoreLabel = this.createScoreLabel(16, 16, 8);
+    this.scoreLabel = this.createScoreLabel(16, 16, this.currentScore);
+    this.hiScoreLabel = this.createHiScoreLabel(16, 46, this.hiScore);
 
     this.bombSpawner = new BombSpawner(this, KEYS.BOMB);
     const bombGroup = this.bombSpawner.group;
@@ -58,6 +61,11 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     if( this.gameOver ){
+      if( this.cursors.space.isDown ){
+        this.gameOver = false;
+        this.setScore(0);
+        this.scene.restart();
+      }
       return;
     }
     
@@ -72,7 +80,7 @@ export default class MainScene extends Phaser.Scene {
       this.player.anims.play('turn');
     }
     
-    if( this.cursors.up.isDown && this.player.body.touching.down ){
+    if( this.player.body.touching.down && (this.cursors.up.isDown || this.cursors.space.isDown) ){
       this.player.setVelocityY(-330);
     }
   }
@@ -119,11 +127,20 @@ export default class MainScene extends Phaser.Scene {
 
   createScoreLabel( x, y, score ){
     const style = { fontSize: '32px', fill: '#000' }
-    const label = new ScoreLabel( this, x, y, score, style );
+    const label = new ScoreLabel( this, x, y, score, style, 'Score: #{score}' );
 
     this.add.existing(label);
 
     return label;
+  }
+
+  createHiScoreLabel( x, y, score ){
+    const style = { fontSize: '32px', fill: '#000' }
+    const hiLabel = new ScoreLabel( this, x, y, score, style, 'Hi: #{score}' );
+
+    this.add.existing(hiLabel);
+
+    return hiLabel;
   }
 
   createStars(){
@@ -146,7 +163,7 @@ export default class MainScene extends Phaser.Scene {
 
   collectStar(player, star){
     star.disableBody(true, true);
-    this.scoreLabel.add(10);
+    this.addScore(10);
 
     if( this.stars.countActive(true) === 0 ){
       //  A new batch of stars to collect
@@ -163,5 +180,18 @@ export default class MainScene extends Phaser.Scene {
     player.setTint(0xff0000);
     player.anims.play('turn');
     this.gameOver = true;
+  }
+
+  addScore(score){
+    score += this.currentScore;
+    this.setScore(score);
+  }
+
+  setScore(score){
+    this.currentScore = score;
+    this.scoreLabel.setScore(this.currentScore);
+
+    this.hiScore = Math.max(this.currentScore, this.hiScore);
+    this.hiScoreLabel.setScore(this.hiScore);
   }
 }
