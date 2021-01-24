@@ -20,6 +20,9 @@ export default class MainScene extends Phaser.Scene {
     this.bombSpawner = undefined;
     this.currentScore = 0;
     this.hiScore = 0;
+    this.playerPlatformCollider = undefined;
+    this.playerBombsCollider = undefined;
+    this.playerStarsOverlap = undefined;
     
     this.gameOver = false;
   }
@@ -45,16 +48,19 @@ export default class MainScene extends Phaser.Scene {
 
     this.scoreLabel = this.createScoreLabel(16, 16, this.currentScore);
     this.hiScoreLabel = this.createHiScoreLabel(16, 46, this.hiScore);
+    this.gamerOverLabel = this.add.text(400, 300, 'Game Over', { fontSize: '64px', fill: '#000' });
+    this.gamerOverLabel.setOrigin(0.5);
+    this.gamerOverLabel.setVisible(false);
 
     this.bombSpawner = new BombSpawner(this, KEYS.BOMB);
     const bombGroup = this.bombSpawner.group;
 
-    this.physics.add.collider(this.player, platforms);
+    this.playerPlatformCollider = this.physics.add.collider(this.player, platforms);
+    this.playerBombsCollider = this.physics.add.collider(this.player, bombGroup, this.hitBomb, null, this);
     this.physics.add.collider(this.stars, platforms);
     this.physics.add.collider(bombGroup, platforms);
-    this.physics.add.collider(this.player, bombGroup, this.hitBomb, null, this);
 
-    this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
+    this.playerStarsOverlap = this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
 
     this.cursors = this.input.keyboard.createCursorKeys();
   }
@@ -63,6 +69,7 @@ export default class MainScene extends Phaser.Scene {
     if( this.gameOver ){
       if( this.cursors.space.isDown ){
         this.gameOver = false;
+        this.gamerOverLabel.setVisible(false);
         this.setScore(0);
         this.scene.restart();
       }
@@ -176,10 +183,16 @@ export default class MainScene extends Phaser.Scene {
   }
 
   hitBomb(player, star){
-    this.physics.pause();
     player.setTint(0xff0000);
     player.anims.play('turn');
+    this.playerPlatformCollider.destroy();
+    this.playerBombsCollider.destroy();
+    this.playerStarsOverlap.destroy();
+    this.player.setVelocityY(100);
+    this.player.setVelocityX(0);
+    this.player.setCollideWorldBounds(false);
     this.gameOver = true;
+    this.gamerOverLabel.setVisible(true);
   }
 
   addScore(score){
