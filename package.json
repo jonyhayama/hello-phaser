@@ -25,6 +25,7 @@
 		"parcel-plugin-static-files-copy": "^2.4.3"
 	},
 	"dependencies": {
+		"deepmerge": "^4.2.2",
 		"phaser": "^3.50.1"
 	},
 	"parcelCleanPaths": [

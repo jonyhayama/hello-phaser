@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 
 import MainScene from './scenes/MainScene'
+const merge = require('deepmerge')
 
 const config = {
 	type: Phaser.AUTO,
@@ -16,4 +17,17 @@ const config = {
 	scene: [MainScene]
 }
 
-export default new Phaser.Game(config)
+const APP = {
+	game: new Phaser.Game(config)
+}
+
+document.getElementById('game-debug-toggle').addEventListener('change', function(e){
+	e.preventDefault();
+	let debug = e.target.checked;
+	
+	APP.game.destroy(true);
+	APP.game = new Phaser.Game(merge(config, { physics: { arcade: { debug } } }))
+
+});
+
+export default APP
