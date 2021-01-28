@@ -32,10 +32,10 @@ export default class MainScene extends Phaser.Scene {
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
     this.load.image(KEYS.STAR, 'assets/img/star.png');
-    
-    this.load.spritesheet(KEYS.DUDE, 'assets/img/dude.png', {
+
+    this.load.spritesheet(KEYS.DUDE, 'assets/img/pink-monster.png', {
       frameWidth: 32,
-      frameHeight: 48
+      frameHeight: 32
     });
   }
 
@@ -75,21 +75,38 @@ export default class MainScene extends Phaser.Scene {
       }
       return;
     }
-    
+
+    if( !this.player.body.touching.down ) {
+      if( this.player.body.velocity.y < 0 ){
+        this.player.anims.play('jump', true);
+      } else {
+        this.player.anims.play('fall', true);
+      }
+    } else {
+      if(this.cursors.up.isDown || this.cursors.space.isDown){
+        this.player.anims.play('idle', true);
+        this.player.setVelocityY(-330);
+      }
+
+      if( this.cursors.left.isDown ){
+        this.player.anims.play('run', true);
+      } else if ( this.cursors.right.isDown ){
+        this.player.anims.play('run', true);
+      } else {
+        this.player.anims.play('idle', true);
+      }
+    }
+
     if( this.cursors.left.isDown ){
+      this.player.flipX = true;
       this.player.setVelocityX(-160);
-      this.player.anims.play('left', true);
     } else if ( this.cursors.right.isDown ){
+      this.player.flipX = false;
       this.player.setVelocityX(160);
-      this.player.anims.play('right', true);
     } else {
       this.player.setVelocityX(0);
-      this.player.anims.play('turn');
     }
     
-    if( this.player.body.touching.down && (this.cursors.up.isDown || this.cursors.space.isDown) ){
-      this.player.setVelocityY(-330);
-    }
   }
 
   createPlatforms(){
@@ -110,25 +127,37 @@ export default class MainScene extends Phaser.Scene {
 		player.setCollideWorldBounds(true)
 
 		this.anims.create({
-			key: 'left',
+			key: 'run',
+			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 8, end: 13 }),
+			frameRate: 10,
+			repeat: -1
+		})
+		
+		this.anims.create({
+			key: 'idle',
 			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 0, end: 3 }),
-			frameRate: 10,
-			repeat: -1
+      frameRate: 10,
+      repeat: -1
 		})
 		
 		this.anims.create({
-			key: 'turn',
-			frames: [ { key: KEYS.DUDE, frame: 4 } ],
-			frameRate: 20
-		})
-		
-		this.anims.create({
-			key: 'right',
-			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 5, end: 8 }),
-			frameRate: 10,
-			repeat: -1
+			key: 'jump',
+			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 16, end: 19 }),
+      frameRate: 20,
     })
     
+		this.anims.create({
+			key: 'fall',
+			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 20, end: 23 }),
+      frameRate: 20,
+		})
+    
+		this.anims.create({
+			key: 'die',
+			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 24, end: 31 }),
+      frameRate: 10,
+		})
+		
     return player;
   }
 
@@ -183,8 +212,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   hitBomb(player, star){
-    player.setTint(0xff0000);
-    player.anims.play('turn');
+    player.anims.play('die');
     this.playerPlatformCollider.destroy();
     this.playerBombsCollider.destroy();
     this.playerStarsOverlap.destroy();
