@@ -19,7 +19,7 @@ export default class MainScene extends Phaser.Scene {
     this.stars = undefined
     this.bombSpawner = undefined;
     this.currentScore = 0;
-    this.hiScore = 0;
+    this.hiScore = Math.max( JSON.parse( localStorage.getItem('@helloPhaser/MainScene/hiScore') ), 0 );
     this.playerPlatformCollider = undefined;
     this.playerBombsCollider = undefined;
     this.playerStarsOverlap = undefined;
@@ -233,6 +233,7 @@ export default class MainScene extends Phaser.Scene {
     this.scoreLabel.setScore(this.currentScore);
 
     this.hiScore = Math.max(this.currentScore, this.hiScore);
+    localStorage.setItem('@helloPhaser/MainScene/hiScore', JSON.stringify(this.hiScore));
     this.hiScoreLabel.setScore(this.hiScore);
   }
 }
