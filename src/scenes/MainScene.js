@@ -123,6 +123,7 @@ export default class MainScene extends Phaser.Scene {
 
   createPlayer(){
     const player = this.physics.add.sprite(100, 450, KEYS.DUDE)
+    player.setCircle(13, 2, 5);
 		player.setBounce(0.2)
 		player.setCollideWorldBounds(true)
 
@@ -192,6 +193,7 @@ export default class MainScene extends Phaser.Scene {
 
     stars.children.iterate((child) => {
       child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+      child.setCircle(12, 0, 0);
     });
 
     return stars;
