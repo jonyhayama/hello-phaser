@@ -63,6 +63,8 @@ export default class MainScene extends Phaser.Scene {
     this.playerStarsOverlap = this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
 
     this.cursors = this.input.keyboard.createCursorKeys();
+
+    this.createParticles();
   }
 
   update() {
@@ -162,6 +164,17 @@ export default class MainScene extends Phaser.Scene {
     return player;
   }
 
+  createParticles() {
+    this.particles = this.add.particles(KEYS.STAR);
+    this.emitter = this.particles.createEmitter({
+      speed: 200,
+      lifespan: 500,
+      blendMode: 'ADD',
+      scale: { start: 1, end: 0 },
+      on: false
+    })
+  }
+
   createScoreLabel( x, y, score ){
     const style = { fontSize: '32px', fill: '#000' }
     const label = new ScoreLabel( this, x, y, score, style, 'Score: #{score}' );
@@ -201,6 +214,7 @@ export default class MainScene extends Phaser.Scene {
 
   collectStar(player, star){
     star.disableBody(true, true);
+    this.particles.emitParticleAt(star.x, star.y, 50);
     this.addScore(10);
 
     if( this.stars.countActive(true) === 0 ){
