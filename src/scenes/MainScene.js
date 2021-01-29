@@ -211,13 +211,20 @@ export default class MainScene extends Phaser.Scene {
     this.bombSpawner.spawn(player.x)
   }
 
-  hitBomb(player, star){
+  hitBomb(player, bomb){
     player.anims.play('die');
+    player.on('animationcomplete', function(evt){
+      if( evt.key == 'die' ){
+        this.disableBody(true, true);
+      }
+    })
+    player.body.stop();
+    player.body.allowGravity = false;
+    bomb.body.stop();
+    bomb.body.allowGravity = false;
     this.playerPlatformCollider.destroy();
     this.playerBombsCollider.destroy();
     this.playerStarsOverlap.destroy();
-    this.player.setVelocityY(100);
-    this.player.setVelocityX(0);
     this.player.setCollideWorldBounds(false);
     this.gameOver = true;
     this.gamerOverLabel.setVisible(true);
