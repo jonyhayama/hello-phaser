@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 
 import MainScene from './scenes/MainScene'
+import PreloadScene from './scenes/PreloadScene'
 const merge = require('deepmerge')
 let debugMode = JSON.parse( localStorage.getItem('@helloPhaser/structure/debugMode') );
 const config = {
@@ -15,7 +16,7 @@ const config = {
 			debug: debugMode
 		}
 	},
-	scene: [MainScene]
+	scene: [PreloadScene, MainScene]
 }
 
 const APP = {

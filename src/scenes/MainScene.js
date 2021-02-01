@@ -27,16 +27,25 @@ export default class MainScene extends Phaser.Scene {
     this.gameOver = false;
   }
 
+  init(data){
+    switch( data.selectedPlayer ){
+      case 1:
+        KEYS.DUDE = 'dude'
+        break;
+      case 2:
+        KEYS.DUDE = 'dude2'
+        break;
+      case 3:
+        KEYS.DUDE = 'dude3'
+        break;
+    }
+  }
+
   preload() {
     this.load.image(KEYS.BOMB, 'assets/img/bomb.png');
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
     this.load.image(KEYS.STAR, 'assets/img/star.png');
-
-    this.load.spritesheet(KEYS.DUDE, 'assets/img/pink-monster.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    });
   }
 
   create() {
