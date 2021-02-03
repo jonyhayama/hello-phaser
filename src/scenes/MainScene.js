@@ -27,8 +27,15 @@ export default class MainScene extends Phaser.Scene {
     this.gameOver = false;
   }
 
-  init(data){
-    switch( data.selectedPlayer ){
+  preload() {
+    this.load.image(KEYS.BOMB, 'assets/img/bomb.png');
+    this.load.image(KEYS.GROUND, 'assets/img/platform.png');
+    this.load.image('sky', 'assets/img/sky.png');
+    this.load.image(KEYS.STAR, 'assets/img/star.png');
+  }
+
+  create() {
+    switch( this.scene.get('preload-scene').selected ){
       case 1:
         KEYS.DUDE = 'dude'
         break;
@@ -39,16 +46,7 @@ export default class MainScene extends Phaser.Scene {
         KEYS.DUDE = 'dude3'
         break;
     }
-  }
-
-  preload() {
-    this.load.image(KEYS.BOMB, 'assets/img/bomb.png');
-    this.load.image(KEYS.GROUND, 'assets/img/platform.png');
-    this.load.image('sky', 'assets/img/sky.png');
-    this.load.image(KEYS.STAR, 'assets/img/star.png');
-  }
-
-  create() {
+    
     this.add.image(400, 300, 'sky');
 
     const platforms = this.createPlatforms();
@@ -74,6 +72,12 @@ export default class MainScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.createParticles();
+
+    this.input.keyboard.on('keyup-' + 'ESC', (event) => { 
+      this.gameOver = false
+      this.scene.restart();
+      this.scene.start('preload-scene');
+    } );
   }
 
   update() {
@@ -138,32 +142,37 @@ export default class MainScene extends Phaser.Scene {
 		player.setBounce(0.2)
 		player.setCollideWorldBounds(true)
 
+    this.anims.remove('run');
 		this.anims.create({
 			key: 'run',
 			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 8, end: 13 }),
 			frameRate: 10,
 			repeat: -1
 		})
-		
+
+    this.anims.remove('idle');
 		this.anims.create({
 			key: 'idle',
 			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1
 		})
-		
+    
+    this.anims.remove('jump');
 		this.anims.create({
 			key: 'jump',
 			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 16, end: 19 }),
       frameRate: 20,
     })
     
+    this.anims.remove('fall');
 		this.anims.create({
 			key: 'fall',
 			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 20, end: 23 }),
       frameRate: 20,
 		})
     
+    this.anims.remove('die');
 		this.anims.create({
 			key: 'die',
 			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 24, end: 31 }),

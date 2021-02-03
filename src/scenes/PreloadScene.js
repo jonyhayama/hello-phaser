@@ -3,7 +3,8 @@ import Phaser from 'phaser'
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
     super('preload-scene')
-    this.selected = null;
+    this.selected = 1;
+    this.menuItem = 1;
   }
 
   preload() {
@@ -33,6 +34,16 @@ export default class PreloadScene extends Phaser.Scene {
   create() {
     this.add.image(400, 300, 'sky');
 
+    let textStyle = { fontSize: '32px', fill: '#fff', padding: 10, fontStyle: 'bold' };
+
+    this.startGameLabel = this.add.text(400, 420, 'Start Game', textStyle);
+    this.startGameLabel.setOrigin(0.5);
+
+    this.optionsLabel = this.add.text(400, ( 420 + this.startGameLabel.height ) , 'Options', textStyle);
+    this.optionsLabel.setOrigin(0.5);
+
+    this.setMenuItem( this.menuItem );
+
     this.anims.create({
 			key: 'selected',
 			frames: [ { key: 'selector', frame: 1 } ],
@@ -48,7 +59,14 @@ export default class PreloadScene extends Phaser.Scene {
     
     this.input.keyboard.addCapture('SPACE');
     this.input.keyboard.on('keyup-' + 'SPACE', (event) => { 
-      this.scene.start('main-scene', { selectedPlayer: this.selected });
+      switch( this.menuItem ){
+        case 1: 
+          this.scene.start('main-scene');
+          break;
+        case 2:
+          this.scene.start('options-scene');
+          break;
+      }
     });
 
     this.input.keyboard.on('keyup-' + 'RIGHT', (event) => { 
@@ -61,7 +79,17 @@ export default class PreloadScene extends Phaser.Scene {
       this.setSelected(playerIdx);
     });
 
-    this.player = this.physics.add.sprite(128, 128, 'dude')
+    this.input.keyboard.on('keyup-' + 'DOWN', (event) => { 
+      let itemIdx = Math.min((this.menuItem + 1), 2);
+      this.setMenuItem(itemIdx);
+    });
+    
+    this.input.keyboard.on('keyup-' + 'UP', (event) => { 
+      let itemIdx = Math.max((this.menuItem - 1), 1);
+      this.setMenuItem(itemIdx);
+    });
+
+    this.player = this.physics.add.sprite( ( 85 + 128), 290, 'dude')
     this.player.body.allowGravity = false;
     this.anims.create({
 			key: 'select-idle',
@@ -72,7 +100,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.player.setScale(2).refreshBody();
     this.player.setDepth(1);
 
-    this.player2 = this.physics.add.sprite(320, 128, 'dude2')
+    this.player2 = this.physics.add.sprite( ( 85 + 320), 290, 'dude2')
     this.player2.body.allowGravity = false;
     this.anims.create({
 			key: 'select-idle2',
@@ -83,7 +111,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.player2.setScale(2).refreshBody();
     this.player2.setDepth(1);
 
-    this.player3 = this.physics.add.sprite(512, 128, 'dude3')
+    this.player3 = this.physics.add.sprite( ( 85 + 512), 290, 'dude3')
     this.player3.body.allowGravity = false;
     this.anims.create({
 			key: 'select-idle3',
@@ -94,22 +122,20 @@ export default class PreloadScene extends Phaser.Scene {
     this.player3.setScale(2).refreshBody();
     this.player3.setDepth(1);
 
-    this.graphics = this.physics.add.sprite(128, 128, 'selector');
+    this.graphics = this.physics.add.sprite( ( 85 + 128), 290, 'selector');
     this.graphics.body.allowGravity = false;
 
-    this.graphics2 = this.physics.add.sprite(320, 128, 'selector');
+    this.graphics2 = this.physics.add.sprite( ( 85 + 320), 290, 'selector');
     this.graphics2.body.allowGravity = false;
 
-    this.graphics3 = this.physics.add.sprite(512, 128, 'selector');
+    this.graphics3 = this.physics.add.sprite( ( 85 + 512), 290, 'selector');
     this.graphics3.body.allowGravity = false;
 
-    this.setSelected( 1 );
+    this.setSelected( this.selected );
   }
 
   setSelected( playerIdx ){
-    if( playerIdx == this.selected){
-      return;
-    }
+    
     this.selected = playerIdx;
     this.player.anims.stop();
     this.graphics.anims.play('not-selected');
@@ -134,7 +160,20 @@ export default class PreloadScene extends Phaser.Scene {
         this.graphics3.anims.play('selected');
         break;
     }
-    
   }
+  
+  setMenuItem( itemIdx ){
+    this.menuItem = itemIdx;
+    this.startGameLabel.setAlpha(0.6);
+    this.optionsLabel.setAlpha(0.6);
 
+    switch( this.menuItem ){
+      case 1:
+        this.startGameLabel.setAlpha(1);
+        break;
+      case 2:
+        this.optionsLabel.setAlpha(1);
+        break;
+    }
+  }
 }
