@@ -74,7 +74,8 @@ export default class MainScene extends Phaser.Scene {
     this.createParticles();
 
     this.input.keyboard.on('keyup-' + 'ESC', (event) => { 
-      this.gameOver = false
+      this.gameOver = false;
+      this.setScore(0);
       this.scene.restart();
       this.scene.start('preload-scene');
     } );
