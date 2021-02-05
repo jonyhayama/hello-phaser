@@ -5,7 +5,7 @@ import BombSpawner from './BombSpawner'
 const KEYS = {
   GROUND: 'ground',
   DUDE: 'dude',
-  STAR: 'star',
+  CUPCAKE: 'cupcake',
   BOMB: 'bomb'
 }
 
@@ -16,13 +16,13 @@ export default class MainScene extends Phaser.Scene {
     this.player = undefined;
     this.cursors = undefined;
     this.scoreLabel = undefined;
-    this.stars = undefined
+    this.cupcakes = undefined
     this.bombSpawner = undefined;
     this.currentScore = 0;
     this.hiScore = Math.max( JSON.parse( localStorage.getItem('@helloPhaser/MainScene/hiScore') ), 0 );
     this.playerPlatformCollider = undefined;
     this.playerBombsCollider = undefined;
-    this.playerStarsOverlap = undefined;
+    this.playerCupcakesOverlap = undefined;
     
     this.gameOver = false;
   }
@@ -31,7 +31,7 @@ export default class MainScene extends Phaser.Scene {
     this.load.image(KEYS.BOMB, 'assets/img/bomb.png');
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
-    this.load.image(KEYS.STAR, 'assets/img/star.png');
+    this.load.image(KEYS.CUPCAKE, 'assets/img/cupcake.png');
   }
 
   create() {
@@ -51,7 +51,7 @@ export default class MainScene extends Phaser.Scene {
 
     const platforms = this.createPlatforms();
     this.player = this.createPlayer();
-    this.stars = this.createStars();
+    this.cupcakes = this.createCupcakes();
 
     this.scoreLabel = this.createScoreLabel(16, 16, this.currentScore);
     this.hiScoreLabel = this.createHiScoreLabel(16, 46, this.hiScore);
@@ -64,10 +64,10 @@ export default class MainScene extends Phaser.Scene {
 
     this.playerPlatformCollider = this.physics.add.collider(this.player, platforms);
     this.playerBombsCollider = this.physics.add.collider(this.player, bombGroup, this.hitBomb, null, this);
-    this.physics.add.collider(this.stars, platforms);
+    this.physics.add.collider(this.cupcakes, platforms);
     this.physics.add.collider(bombGroup, platforms);
 
-    this.playerStarsOverlap = this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
+    this.playerCupcakesOverlap = this.physics.add.overlap(this.player, this.cupcakes, this.collectCupcake, null, this);
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -184,7 +184,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createParticles() {
-    this.particles = this.add.particles(KEYS.STAR);
+    this.particles = this.add.particles(KEYS.CUPCAKE);
     this.emitter = this.particles.createEmitter({
       speed: 200,
       lifespan: 500,
@@ -212,9 +212,9 @@ export default class MainScene extends Phaser.Scene {
     return hiLabel;
   }
 
-  createStars(){
-    const stars = this.physics.add.group({
-      key: KEYS.STAR,
+  createCupcakes(){
+    const cupcakes = this.physics.add.group({
+      key: KEYS.CUPCAKE,
       repeat: 11,
       setXY: {
         x: 12, 
@@ -223,22 +223,22 @@ export default class MainScene extends Phaser.Scene {
       }
     });
 
-    stars.children.iterate((child) => {
+    cupcakes.children.iterate((child) => {
       child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-      child.setCircle(12, 0, 0);
+      child.setCircle(11, 2, 4);
     });
 
-    return stars;
+    return cupcakes;
   }
 
-  collectStar(player, star){
-    star.disableBody(true, true);
-    this.particles.emitParticleAt(star.x, star.y, 50);
+  collectCupcake(player, cupcake){
+    cupcake.disableBody(true, true);
+    this.particles.emitParticleAt(cupcake.x, cupcake.y, 50);
     this.addScore(10);
 
-    if( this.stars.countActive(true) === 0 ){
-      //  A new batch of stars to collect
-			this.stars.children.iterate((child) => {
+    if( this.cupcakes.countActive(true) === 0 ){
+      //  A new batch of cupcakes to collect
+			this.cupcakes.children.iterate((child) => {
 				child.enableBody(true, child.x, 0, true, true)
 			});
     }
@@ -259,7 +259,7 @@ export default class MainScene extends Phaser.Scene {
     bomb.body.allowGravity = false;
     this.playerPlatformCollider.destroy();
     this.playerBombsCollider.destroy();
-    this.playerStarsOverlap.destroy();
+    this.playerCupcakesOverlap.destroy();
     this.player.setCollideWorldBounds(false);
     this.gameOver = true;
     this.gamerOverLabel.setVisible(true);
