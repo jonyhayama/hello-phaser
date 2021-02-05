@@ -19,10 +19,12 @@ export default class BombSpawner {
     const x = (playerX < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400)
 
     const bomb = this.group.create(x, 16, this.key)
-    bomb.setCircle(11, 2, 9);
+    bomb.setCircle(11, 9, 9);
     bomb.setBounce(1)
     bomb.setCollideWorldBounds(true)
     bomb.setVelocity(Phaser.Math.Between(-200, 200), 20)
+    bomb.setAngularVelocity(50);
+    bomb.setMaxVelocity(500);
 
     return bomb
   }

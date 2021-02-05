@@ -28,7 +28,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image(KEYS.BOMB, 'assets/img/bomb.png');
+    this.load.image(KEYS.BOMB, 'assets/img/bomb-new.png');
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
     this.load.image(KEYS.CUPCAKE, 'assets/img/cupcake.png');
@@ -64,6 +64,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.playerPlatformCollider = this.physics.add.collider(this.player, platforms);
     this.playerBombsCollider = this.physics.add.collider(this.player, bombGroup, this.hitBomb, null, this);
+    this.BombsBombsCollider = this.physics.add.collider(bombGroup, bombGroup, null, null, this);
     this.physics.add.collider(this.cupcakes, platforms);
     this.physics.add.collider(bombGroup, platforms);
 
