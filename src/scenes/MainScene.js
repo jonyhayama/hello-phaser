@@ -1,12 +1,14 @@
 import Phaser from 'phaser'
 import ScoreLabel from '../ui/ScoreLabel'
 import BombSpawner from './BombSpawner'
+import StarSpawner from './StarSpawner'
 
 const KEYS = {
   GROUND: 'ground',
   DUDE: 'dude',
   CUPCAKE: 'cupcake',
-  BOMB: 'bomb'
+  BOMB: 'bomb',
+  STAR: 'star'
 }
 
 export default class MainScene extends Phaser.Scene {
@@ -18,6 +20,7 @@ export default class MainScene extends Phaser.Scene {
     this.scoreLabel = undefined;
     this.cupcakes = undefined
     this.bombSpawner = undefined;
+    this.starSpawner = undefined;
     this.currentScore = 0;
     this.hiScore = Math.max( JSON.parse( localStorage.getItem('@helloPhaser/MainScene/hiScore') ), 0 );
     this.playerPlatformCollider = undefined;
@@ -32,6 +35,7 @@ export default class MainScene extends Phaser.Scene {
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
     this.load.image(KEYS.CUPCAKE, 'assets/img/cupcake.png');
+    this.load.image(KEYS.STAR, 'assets/img/star.png');
   }
 
   create() {
@@ -62,11 +66,36 @@ export default class MainScene extends Phaser.Scene {
     this.bombSpawner = new BombSpawner(this, KEYS.BOMB);
     const bombGroup = this.bombSpawner.group;
 
+    this.starSpawner = new StarSpawner(this, KEYS.STAR);
+    const starGroup = this.starSpawner.group;
+
     this.playerPlatformCollider = this.physics.add.collider(this.player, platforms);
     this.playerBombsCollider = this.physics.add.collider(this.player, bombGroup, this.hitBomb, null, this);
+    this.playerStarsCollider = this.physics.add.collider(this.player, starGroup, this.collectStar, null, this);
     this.BombsBombsCollider = this.physics.add.collider(bombGroup, bombGroup, null, null, this);
+    this.StarsStarsCollider = this.physics.add.collider(starGroup, starGroup, null, null, this);
+    this.BombsStarsCollider = this.physics.add.collider(bombGroup, starGroup, null, null, this);
     this.physics.add.collider(this.cupcakes, platforms);
     this.physics.add.collider(bombGroup, platforms);
+    this.physics.add.collider(starGroup, platforms);
+
+    this.playerTween = this.tweens.addCounter({
+      from: 50,
+      to: 205,
+      duration: 150,
+      yoyo: true,
+      repeat: -1,
+      onUpdate: (tween) =>
+      {
+        const value = Math.floor(tween.getValue());
+        this.player.setTint(Phaser.Display.Color.GetColor(255, 255, value));
+      },
+      onStop: (tween) => {
+        this.player.clearTint();
+      }
+    });
+
+    this.playerTween.stop();
 
     this.playerCupcakesOverlap = this.physics.add.overlap(this.player, this.cupcakes, this.collectCupcake, null, this);
 
@@ -232,6 +261,19 @@ export default class MainScene extends Phaser.Scene {
     return cupcakes;
   }
 
+  collectStar(player, star){
+    star.destroy();
+
+    if( this.playerTween.isPlaying() ){
+      return;
+    }
+    
+    this.playerTween.play();
+    setTimeout(() => {
+      this.playerTween.stop();
+    }, 10000);
+  }
+
   collectCupcake(player, cupcake){
     cupcake.disableBody(true, true);
     this.particles.emitParticleAt(cupcake.x, cupcake.y, 50);
@@ -245,9 +287,16 @@ export default class MainScene extends Phaser.Scene {
     }
 
     this.bombSpawner.spawn(player.x)
+
+    this.starSpawner.spawn(player.x)
   }
 
   hitBomb(player, bomb){
+    if( this.playerTween.isPlaying() ){
+      bomb.destroy();
+      return;
+    }
+
     player.anims.play('die');
     player.on('animationcomplete', function(evt){
       if( evt.key == 'die' ){
