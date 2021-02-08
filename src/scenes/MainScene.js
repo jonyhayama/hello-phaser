@@ -23,6 +23,8 @@ export default class MainScene extends Phaser.Scene {
     this.starSpawner = undefined;
     this.currentScore = 0;
     this.hiScore = Math.max( JSON.parse( localStorage.getItem('@helloPhaser/MainScene/hiScore') ), 0 );
+    this.superStar = 10;
+    this.superStarInterval = null;
     this.playerPlatformCollider = undefined;
     this.playerBombsCollider = undefined;
     this.playerCupcakesOverlap = undefined;
@@ -62,6 +64,9 @@ export default class MainScene extends Phaser.Scene {
     this.gamerOverLabel = this.add.text(400, 300, 'Game Over', { fontSize: '64px', fill: '#000' });
     this.gamerOverLabel.setOrigin(0.5);
     this.gamerOverLabel.setVisible(false);
+    
+    this.SuperStarLabel = this.createSuperStarLabel(16, 76, 0);
+    this.SuperStarLabel.setVisible(false);
 
     this.bombSpawner = new BombSpawner(this, KEYS.BOMB);
     const bombGroup = this.bombSpawner.group;
@@ -242,6 +247,15 @@ export default class MainScene extends Phaser.Scene {
     return hiLabel;
   }
 
+  createSuperStarLabel( x, y, score ){
+    const style = { fontSize: '32px', fill: '#000' }
+    const superStarLabel = new ScoreLabel( this, x, y, score, style, 'Super Star: #{score}s' );
+
+    this.add.existing(superStarLabel);
+
+    return superStarLabel;
+  }
+
   createCupcakes(){
     const cupcakes = this.physics.add.group({
       key: KEYS.CUPCAKE,
@@ -267,11 +281,25 @@ export default class MainScene extends Phaser.Scene {
     if( this.playerTween.isPlaying() ){
       return;
     }
+
+    this.superStar = 10;
+    this.SuperStarLabel.setScore(10);
+    this.SuperStarLabel.setVisible(true);
     
     this.playerTween.play();
-    setTimeout(() => {
+    this.superStarInterval = setInterval(() => {
+      if( this.superStar > 0 ){
+        this.superStar -= 1;
+        this.SuperStarLabel.setScore(this.superStar);
+        return;
+      }
+
+      this.superStar = 0;
+      this.SuperStarLabel.setVisible(false);
       this.playerTween.stop();
-    }, 10000);
+      clearInterval(this.superStarInterval);
+    }, 1000);
+    
   }
 
   collectCupcake(player, cupcake){
@@ -294,6 +322,7 @@ export default class MainScene extends Phaser.Scene {
   hitBomb(player, bomb){
     if( this.playerTween.isPlaying() ){
       bomb.destroy();
+      this.addScore(20);
       return;
     }
 
