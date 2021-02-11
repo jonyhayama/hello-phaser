@@ -33,7 +33,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image(KEYS.BOMB, 'assets/img/bomb-new.png');
+    this.load.spritesheet(KEYS.BOMB, 'assets/img/bomb-sprite.png', {
+      frameWidth: 41,
+      frameHeight: 41
+    });
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
     this.load.image(KEYS.CUPCAKE, 'assets/img/cupcake.png');
@@ -69,19 +72,33 @@ export default class MainScene extends Phaser.Scene {
     this.SuperStarLabel.setVisible(false);
 
     this.bombSpawner = new BombSpawner(this, KEYS.BOMB);
-    const bombGroup = this.bombSpawner.group;
+    this.bombGroup = this.bombSpawner.group;
+
+    this.anims.create({
+			key: 'bomb-alt',
+			frames: this.anims.generateFrameNumbers(KEYS.BOMB, { start: 1, end: 1 }),
+			frameRate: 10,
+			repeat: -1
+		})
+
+    this.anims.create({
+			key: 'bomb',
+			frames: this.anims.generateFrameNumbers(KEYS.BOMB, { start: 0, end: 0 }),
+			frameRate: 10,
+			repeat: -1
+		})
 
     this.starSpawner = new StarSpawner(this, KEYS.STAR);
     const starGroup = this.starSpawner.group;
 
     this.playerPlatformCollider = this.physics.add.collider(this.player, platforms);
-    this.playerBombsCollider = this.physics.add.collider(this.player, bombGroup, this.hitBomb, null, this);
+    this.playerBombsCollider = this.physics.add.collider(this.player, this.bombGroup, this.hitBomb, null, this);
     this.playerStarsCollider = this.physics.add.collider(this.player, starGroup, this.collectStar, null, this);
-    this.BombsBombsCollider = this.physics.add.collider(bombGroup, bombGroup, null, null, this);
+    this.BombsBombsCollider = this.physics.add.collider(this.bombGroup, this.bombGroup, null, null, this);
     this.StarsStarsCollider = this.physics.add.collider(starGroup, starGroup, null, null, this);
-    this.BombsStarsCollider = this.physics.add.collider(bombGroup, starGroup, null, null, this);
+    this.BombsStarsCollider = this.physics.add.collider(this.bombGroup, starGroup, null, null, this);
     this.physics.add.collider(this.cupcakes, platforms);
-    this.physics.add.collider(bombGroup, platforms);
+    this.physics.add.collider(this.bombGroup, platforms);
     this.physics.add.collider(starGroup, platforms);
 
     this.playerTween = this.tweens.addCounter({
@@ -282,6 +299,10 @@ export default class MainScene extends Phaser.Scene {
       return;
     }
 
+    this.bombGroup.children.iterate((child) => {
+      child.anims.play('bomb-alt')
+    });
+
     this.superStar = 10;
     this.SuperStarLabel.setScore(10);
     this.SuperStarLabel.setVisible(true);
@@ -321,14 +342,14 @@ export default class MainScene extends Phaser.Scene {
       max = Math.floor(max);
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    
+
     if( getRandomInt(1, 10) === 1 ){
       this.starSpawner.spawn(player.x)
     }
   }
 
   hitBomb(player, bomb){
-    if( this.playerTween.isPlaying() ){
+    if( this.playerTween.isPlaying() || bomb.anims.getName() == 'bomb-alt' ){
       bomb.destroy();
       this.addScore(20);
       return;
