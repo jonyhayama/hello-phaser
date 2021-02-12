@@ -9,6 +9,7 @@ export default class PreloadScene extends Phaser.Scene {
 
   preload() {
     this.load.image('sky', 'assets/img/sky.png');
+    this.load.image('logo', 'assets/img/hello-phaser-logo.png');
 
     this.load.spritesheet('dude', 'assets/img/pink-monster.png', {
       frameWidth: 32,
@@ -33,6 +34,7 @@ export default class PreloadScene extends Phaser.Scene {
 
   create() {
     this.add.image(400, 300, 'sky');
+    this.add.image(400, 150, 'logo');
 
     let textStyle = { fontSize: '32px', fill: '#fff', padding: 10, fontStyle: 'bold' };
 
