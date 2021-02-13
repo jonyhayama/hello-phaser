@@ -41,6 +41,9 @@ export default class MainScene extends Phaser.Scene {
     this.load.image('sky', 'assets/img/sky.png');
     this.load.image(KEYS.CUPCAKE, 'assets/img/cupcake.png');
     this.load.image(KEYS.STAR, 'assets/img/star.png');
+
+    this.load.image("energycontainer", "assets/img/energycontainer.png");
+    this.load.image("energybar", "assets/img/energybar.png");
   }
 
   create() {
@@ -68,9 +71,6 @@ export default class MainScene extends Phaser.Scene {
     this.gamerOverLabel.setOrigin(0.5);
     this.gamerOverLabel.setVisible(false);
     
-    this.SuperStarLabel = this.createSuperStarLabel(16, 76, 0);
-    this.SuperStarLabel.setVisible(false);
-
     this.bombSpawner = new BombSpawner(this, KEYS.BOMB);
     this.bombGroup = this.bombSpawner.group;
 
@@ -131,6 +131,8 @@ export default class MainScene extends Phaser.Scene {
       this.scene.restart();
       this.scene.start('preload-scene');
     } );
+
+    this.createPowerGauge();
   }
 
   update() {
@@ -292,6 +294,18 @@ export default class MainScene extends Phaser.Scene {
     return cupcakes;
   }
 
+  createPowerGauge() {
+    this.energyContainer = this.add.sprite(160, 575, "energycontainer");
+
+    let energyBar = this.add.sprite(this.energyContainer.x + 23, this.energyContainer.y, "energybar");
+
+    this.energyMask = this.add.sprite(energyBar.x, energyBar.y, "energybar");
+    this.energyMask.x = -this.energyMask.displayWidth;
+    this.energyMask.visible = false;
+
+    energyBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.energyMask);
+  }
+
   collectStar(player, star){
     star.destroy();
 
@@ -304,19 +318,18 @@ export default class MainScene extends Phaser.Scene {
     });
 
     this.superStar = 10;
-    this.SuperStarLabel.setScore(10);
-    this.SuperStarLabel.setVisible(true);
+    this.energyMask.x = this.energyContainer.x + 23;
     
     this.playerTween.play();
     this.superStarInterval = setInterval(() => {
       if( this.superStar > 0 ){
+        let stepLengh = this.energyMask.displayWidth / 10;
         this.superStar -= 1;
-        this.SuperStarLabel.setScore(this.superStar);
+        this.energyMask.x -= stepLengh;
         return;
       }
 
       this.superStar = 0;
-      this.SuperStarLabel.setVisible(false);
       this.playerTween.stop();
       clearInterval(this.superStarInterval);
     }, 1000);
