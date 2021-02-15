@@ -87,7 +87,7 @@ export default class MainScene extends Phaser.Scene {
 			repeat: -1
 		})
 
-    this.starSpawner = new ItemSpawner(this, KEYS.STAR);
+    this.starSpawner = new ItemSpawner(this, KEYS.STAR, 0.9);
     const starGroup = this.starSpawner.group;
 
     this.playerPlatformCollider = this.physics.add.collider(this.player, platforms);
@@ -349,15 +349,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.bombSpawner.spawn(player.x)
 
-    const getRandomInt = function (min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    if( getRandomInt(1, 10) === 1 ){
-      this.starSpawner.spawn(player.x)
-    }
+    this.starSpawner.spawn(player.x)
   }
 
   hitBomb(player, bomb){
