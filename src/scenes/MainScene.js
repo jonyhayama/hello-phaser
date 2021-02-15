@@ -263,15 +263,6 @@ export default class MainScene extends Phaser.Scene {
     return hiLabel;
   }
 
-  createSuperStarLabel( x, y, score ){
-    const style = { fontSize: '32px', fill: '#000' }
-    const superStarLabel = new ScoreLabel( this, x, y, score, style, 'Super Star: #{score}s' );
-
-    this.add.existing(superStarLabel);
-
-    return superStarLabel;
-  }
-
   createCupcakes(){
     const cupcakes = this.physics.add.group({
       key: KEYS.CUPCAKE,
