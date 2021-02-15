@@ -27,6 +27,7 @@ export default class MainScene extends Phaser.Scene {
     this.playerPlatformCollider = undefined;
     this.playerBombsCollider = undefined;
     this.playerCupcakesOverlap = undefined;
+    this.platforms = undefined;
     
     this.gameOver = false;
   }
@@ -46,90 +47,17 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
-    switch( this.scene.get('preload-scene').selected ){
-      case 1:
-        KEYS.DUDE = 'dude'
-        break;
-      case 2:
-        KEYS.DUDE = 'dude2'
-        break;
-      case 3:
-        KEYS.DUDE = 'dude3'
-        break;
-    }
-    
     this.add.image(400, 300, 'sky');
 
-    const platforms = this.createPlatforms();
-    this.player = this.createPlayer();
-    this.cupcakes = this.createCupcakes();
-
-    this.scoreLabel = this.createScoreLabel(16, 16, this.currentScore);
-    this.hiScoreLabel = this.createHiScoreLabel(16, 46, this.hiScore);
-    this.gamerOverLabel = this.add.text(400, 300, 'Game Over', { fontSize: '64px', fill: '#000' });
-    this.gamerOverLabel.setOrigin(0.5);
-    this.gamerOverLabel.setVisible(false);
-    
-    this.bombSpawner = new ItemSpawner(this, KEYS.BOMB);
-
-    this.anims.create({
-			key: 'bomb-alt',
-			frames: this.anims.generateFrameNumbers(KEYS.BOMB, { start: 1, end: 1 }),
-			frameRate: 10,
-			repeat: -1
-		})
-
-    this.anims.create({
-			key: 'bomb',
-			frames: this.anims.generateFrameNumbers(KEYS.BOMB, { start: 0, end: 0 }),
-			frameRate: 10,
-			repeat: -1
-		})
-
-    this.starSpawner = new ItemSpawner(this, KEYS.STAR, 0.9);
-
-    this.playerPlatformCollider = this.physics.add.collider(this.player, platforms);
-    this.playerBombsCollider = this.physics.add.collider(this.player, this.bombSpawner.group, this.hitBomb, null, this);
-    this.playerStarsCollider = this.physics.add.collider(this.player, this.starSpawner.group, this.collectStar, null, this);
-    this.BombsBombsCollider = this.physics.add.collider(this.bombSpawner.group, this.bombSpawner.group, null, null, this);
-    this.StarsStarsCollider = this.physics.add.collider(this.starSpawner.group, this.starSpawner.group, null, null, this);
-    this.BombsStarsCollider = this.physics.add.collider(this.bombSpawner.group, this.starSpawner.group, null, null, this);
-    this.physics.add.collider(this.cupcakes, platforms);
-    this.physics.add.collider(this.bombSpawner.group, platforms);
-    this.physics.add.collider(this.starSpawner.group, platforms);
-
-    this.playerTween = this.tweens.addCounter({
-      from: 50,
-      to: 205,
-      duration: 150,
-      yoyo: true,
-      repeat: -1,
-      onUpdate: (tween) =>
-      {
-        const value = Math.floor(tween.getValue());
-        this.player.setTint(Phaser.Display.Color.GetColor(255, 255, value));
-      },
-      onStop: (tween) => {
-        this.player.clearTint();
-      }
-    });
-
-    this.playerTween.stop();
-
-    this.playerCupcakesOverlap = this.physics.add.overlap(this.player, this.cupcakes, this.collectCupcake, null, this);
-
-    this.cursors = this.input.keyboard.createCursorKeys();
-
-    this.createParticles();
-
-    this.input.keyboard.on('keyup-' + 'ESC', (event) => { 
-      this.gameOver = false;
-      this.setScore(0);
-      this.scene.restart();
-      this.scene.start('preload-scene');
-    } );
-
+    this.createPlatforms();
+    this.createPlayer();
+    this.createCupcakes();
+    this.createLabels();
+    this.createBombs();
+    this.createStars();
+    this.createColliders();
     this.createPowerGauge();
+    this.createConrollers();
   }
 
   update() {
@@ -176,23 +104,88 @@ export default class MainScene extends Phaser.Scene {
     
   }
 
+  createConrollers(){
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    this.input.keyboard.on('keyup-' + 'ESC', (event) => { 
+      this.gameOver = false;
+      this.setScore(0);
+      this.scene.restart();
+      this.scene.start('preload-scene');
+    } );
+  }
+
+  createLabels(){
+    this.scoreLabel = this.createScoreLabel(16, 16, this.currentScore);
+    this.hiScoreLabel = this.createHiScoreLabel(16, 46, this.hiScore);
+    this.gamerOverLabel = this.add.text(400, 300, 'Game Over', { fontSize: '64px', fill: '#000' });
+    this.gamerOverLabel.setOrigin(0.5);
+    this.gamerOverLabel.setVisible(false);
+  }
+
+  createColliders(){
+    this.playerPlatformCollider = this.physics.add.collider(this.player, this.platforms);
+    this.playerBombsCollider = this.physics.add.collider(this.player, this.bombSpawner.group, this.hitBomb, null, this);
+    this.playerStarsCollider = this.physics.add.collider(this.player, this.starSpawner.group, this.collectStar, null, this);
+    this.BombsBombsCollider = this.physics.add.collider(this.bombSpawner.group, this.bombSpawner.group, null, null, this);
+    this.StarsStarsCollider = this.physics.add.collider(this.starSpawner.group, this.starSpawner.group, null, null, this);
+    this.BombsStarsCollider = this.physics.add.collider(this.bombSpawner.group, this.starSpawner.group, null, null, this);
+    this.physics.add.collider(this.cupcakes, this.platforms);
+    this.physics.add.collider(this.bombSpawner.group, this.platforms);
+    this.physics.add.collider(this.starSpawner.group, this.platforms);
+
+    this.playerCupcakesOverlap = this.physics.add.overlap(this.player, this.cupcakes, this.collectCupcake, null, this);
+  }
+
+  createStars(){
+    this.starSpawner = new ItemSpawner(this, KEYS.STAR, 0.9);
+  }
+
+  createBombs(){
+    this.bombSpawner = new ItemSpawner(this, KEYS.BOMB);
+
+    this.anims.create({
+			key: 'bomb-alt',
+			frames: this.anims.generateFrameNumbers(KEYS.BOMB, { start: 1, end: 1 }),
+			frameRate: 10,
+			repeat: -1
+		})
+
+    this.anims.create({
+			key: 'bomb',
+			frames: this.anims.generateFrameNumbers(KEYS.BOMB, { start: 0, end: 0 }),
+			frameRate: 10,
+			repeat: -1
+		})
+  }
+
   createPlatforms(){
-    const platforms = this.physics.add.staticGroup();
+    this.platforms = this.physics.add.staticGroup();
 
-    platforms.create(400, 568, KEYS.GROUND).setScale(2).refreshBody();
+    this.platforms.create(400, 568, KEYS.GROUND).setScale(2).refreshBody();
     
-    platforms.create(600, 400, KEYS.GROUND);
-    platforms.create(50, 250, KEYS.GROUND);
-    platforms.create(750, 220, KEYS.GROUND);
-
-    return platforms;
+    this.platforms.create(600, 400, KEYS.GROUND);
+    this.platforms.create(50, 250, KEYS.GROUND);
+    this.platforms.create(750, 220, KEYS.GROUND);
   }
 
   createPlayer(){
-    const player = this.physics.add.sprite(100, 450, KEYS.DUDE)
-    player.setCircle(13, 2, 5);
-		player.setBounce(0.2)
-		player.setCollideWorldBounds(true)
+    switch( this.scene.get('preload-scene').selected ){
+      case 1:
+        KEYS.DUDE = 'dude'
+        break;
+      case 2:
+        KEYS.DUDE = 'dude2'
+        break;
+      case 3:
+        KEYS.DUDE = 'dude3'
+        break;
+    }
+    
+    this.player = this.physics.add.sprite(100, 450, KEYS.DUDE)
+    this.player.setCircle(13, 2, 5);
+		this.player.setBounce(0.2)
+		this.player.setCollideWorldBounds(true)
 
     this.anims.remove('run');
 		this.anims.create({
@@ -230,8 +223,24 @@ export default class MainScene extends Phaser.Scene {
 			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 24, end: 31 }),
       frameRate: 10,
 		})
-		
-    return player;
+
+    this.playerTween = this.tweens.addCounter({
+      from: 50,
+      to: 205,
+      duration: 150,
+      yoyo: true,
+      repeat: -1,
+      onUpdate: (tween) =>
+      {
+        const value = Math.floor(tween.getValue());
+        this.player.setTint(Phaser.Display.Color.GetColor(255, 255, value));
+      },
+      onStop: (tween) => {
+        this.player.clearTint();
+      }
+    });
+
+    this.playerTween.stop();
   }
 
   createParticles() {
@@ -264,7 +273,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createCupcakes(){
-    const cupcakes = this.physics.add.group({
+    this.cupcakes = this.physics.add.group({
       key: KEYS.CUPCAKE,
       repeat: 11,
       setXY: {
@@ -274,12 +283,12 @@ export default class MainScene extends Phaser.Scene {
       }
     });
 
-    cupcakes.children.iterate((child) => {
+    this.cupcakes.children.iterate((child) => {
       child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
       child.setCircle(11, 2, 4);
     });
 
-    return cupcakes;
+    this.createParticles();
   }
 
   createPowerGauge() {
