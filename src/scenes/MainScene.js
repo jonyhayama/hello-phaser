@@ -71,7 +71,6 @@ export default class MainScene extends Phaser.Scene {
     this.gamerOverLabel.setVisible(false);
     
     this.bombSpawner = new ItemSpawner(this, KEYS.BOMB);
-    this.bombGroup = this.bombSpawner.group;
 
     this.anims.create({
 			key: 'bomb-alt',
@@ -88,17 +87,16 @@ export default class MainScene extends Phaser.Scene {
 		})
 
     this.starSpawner = new ItemSpawner(this, KEYS.STAR, 0.9);
-    const starGroup = this.starSpawner.group;
 
     this.playerPlatformCollider = this.physics.add.collider(this.player, platforms);
-    this.playerBombsCollider = this.physics.add.collider(this.player, this.bombGroup, this.hitBomb, null, this);
-    this.playerStarsCollider = this.physics.add.collider(this.player, starGroup, this.collectStar, null, this);
-    this.BombsBombsCollider = this.physics.add.collider(this.bombGroup, this.bombGroup, null, null, this);
-    this.StarsStarsCollider = this.physics.add.collider(starGroup, starGroup, null, null, this);
-    this.BombsStarsCollider = this.physics.add.collider(this.bombGroup, starGroup, null, null, this);
+    this.playerBombsCollider = this.physics.add.collider(this.player, this.bombSpawner.group, this.hitBomb, null, this);
+    this.playerStarsCollider = this.physics.add.collider(this.player, this.starSpawner.group, this.collectStar, null, this);
+    this.BombsBombsCollider = this.physics.add.collider(this.bombSpawner.group, this.bombSpawner.group, null, null, this);
+    this.StarsStarsCollider = this.physics.add.collider(this.starSpawner.group, this.starSpawner.group, null, null, this);
+    this.BombsStarsCollider = this.physics.add.collider(this.bombSpawner.group, this.starSpawner.group, null, null, this);
     this.physics.add.collider(this.cupcakes, platforms);
-    this.physics.add.collider(this.bombGroup, platforms);
-    this.physics.add.collider(starGroup, platforms);
+    this.physics.add.collider(this.bombSpawner.group, platforms);
+    this.physics.add.collider(this.starSpawner.group, platforms);
 
     this.playerTween = this.tweens.addCounter({
       from: 50,
@@ -312,7 +310,7 @@ export default class MainScene extends Phaser.Scene {
       return;
     }
 
-    this.bombGroup.children.iterate((child) => {
+    this.bombSpawner.group.children.iterate((child) => {
       child.anims.play('bomb-alt')
     });
 
