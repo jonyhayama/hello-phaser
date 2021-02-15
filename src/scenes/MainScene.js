@@ -1,7 +1,6 @@
 import Phaser from 'phaser'
 import ScoreLabel from '../ui/ScoreLabel'
-import BombSpawner from './BombSpawner'
-import StarSpawner from './StarSpawner'
+import ItemSpawner from './ItemSpawner'
 
 const KEYS = {
   GROUND: 'ground',
@@ -71,7 +70,7 @@ export default class MainScene extends Phaser.Scene {
     this.gamerOverLabel.setOrigin(0.5);
     this.gamerOverLabel.setVisible(false);
     
-    this.bombSpawner = new BombSpawner(this, KEYS.BOMB);
+    this.bombSpawner = new ItemSpawner(this, KEYS.BOMB);
     this.bombGroup = this.bombSpawner.group;
 
     this.anims.create({
@@ -88,7 +87,7 @@ export default class MainScene extends Phaser.Scene {
 			repeat: -1
 		})
 
-    this.starSpawner = new StarSpawner(this, KEYS.STAR);
+    this.starSpawner = new ItemSpawner(this, KEYS.STAR);
     const starGroup = this.starSpawner.group;
 
     this.playerPlatformCollider = this.physics.add.collider(this.player, platforms);
