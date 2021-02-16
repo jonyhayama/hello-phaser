@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import ScoreLabel from '../ui/ScoreLabel'
 import ItemSpawner from './ItemSpawner'
+import PlayerController from '../controllers/Player/PlayerController'
 
 const KEYS = {
   GROUND: 'ground',
@@ -62,56 +63,27 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     if( this.gameOver ){
-      if( this.cursors.space.isDown ){
-        this.gameOver = false;
-        this.gamerOverLabel.setVisible(false);
-        this.setScore(0);
-        this.scene.restart();
-      }
       return;
     }
 
-    if( !this.player.body.touching.down ) {
-      if( this.player.body.velocity.y < 0 ){
-        this.player.anims.play('jump', true);
-      } else {
-        this.player.anims.play('fall', true);
-      }
-    } else {
-      if(this.cursors.up.isDown || this.cursors.space.isDown){
-        this.player.anims.play('idle', true);
-        this.player.setVelocityY(-330);
-      }
-
-      if( this.cursors.left.isDown ){
-        this.player.anims.play('run', true);
-      } else if ( this.cursors.right.isDown ){
-        this.player.anims.play('run', true);
-      } else {
-        this.player.anims.play('idle', true);
-      }
-    }
-
-    if( this.cursors.left.isDown ){
-      this.player.flipX = true;
-      this.player.setVelocityX(-160);
-    } else if ( this.cursors.right.isDown ){
-      this.player.flipX = false;
-      this.player.setVelocityX(160);
-    } else {
-      this.player.setVelocityX(0);
-    }
-    
+    this.player.update();
   }
 
   createConrollers(){
-    this.cursors = this.input.keyboard.createCursorKeys();
-
     this.input.keyboard.on('keyup-' + 'ESC', (event) => { 
       this.gameOver = false;
       this.setScore(0);
       this.scene.restart();
       this.scene.start('preload-scene');
+    } );
+
+    this.input.keyboard.on('keyup-' + 'SPACE', (event) => { 
+      if( this.gameOver ){
+        this.gameOver = false;
+        this.gamerOverLabel.setVisible(false);
+        this.setScore(0);
+        this.scene.restart();
+      }
     } );
   }
 
@@ -124,9 +96,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createColliders(){
-    this.playerPlatformCollider = this.physics.add.collider(this.player, this.platforms);
-    this.playerBombsCollider = this.physics.add.collider(this.player, this.bombSpawner.group, this.hitBomb, null, this);
-    this.playerStarsCollider = this.physics.add.collider(this.player, this.starSpawner.group, this.collectStar, null, this);
+    this.playerPlatformCollider = this.physics.add.collider(this.player.player, this.platforms);
+    this.playerBombsCollider = this.physics.add.collider(this.player.player, this.bombSpawner.group, this.hitBomb, null, this);
+    this.playerStarsCollider = this.physics.add.collider(this.player.player, this.starSpawner.group, this.collectStar, null, this);
     this.BombsBombsCollider = this.physics.add.collider(this.bombSpawner.group, this.bombSpawner.group, null, null, this);
     this.StarsStarsCollider = this.physics.add.collider(this.starSpawner.group, this.starSpawner.group, null, null, this);
     this.BombsStarsCollider = this.physics.add.collider(this.bombSpawner.group, this.starSpawner.group, null, null, this);
@@ -134,7 +106,7 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.bombSpawner.group, this.platforms);
     this.physics.add.collider(this.starSpawner.group, this.platforms);
 
-    this.playerCupcakesOverlap = this.physics.add.overlap(this.player, this.cupcakes, this.collectCupcake, null, this);
+    this.playerCupcakesOverlap = this.physics.add.overlap(this.player.player, this.cupcakes, this.collectCupcake, null, this);
   }
 
   createStars(){
@@ -182,65 +154,7 @@ export default class MainScene extends Phaser.Scene {
         break;
     }
     
-    this.player = this.physics.add.sprite(100, 450, KEYS.DUDE)
-    this.player.setCircle(13, 2, 5);
-		this.player.setBounce(0.2)
-		this.player.setCollideWorldBounds(true)
-
-    this.anims.remove('run');
-		this.anims.create({
-			key: 'run',
-			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 8, end: 13 }),
-			frameRate: 10,
-			repeat: -1
-		})
-
-    this.anims.remove('idle');
-		this.anims.create({
-			key: 'idle',
-			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-		})
-    
-    this.anims.remove('jump');
-		this.anims.create({
-			key: 'jump',
-			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 16, end: 19 }),
-      frameRate: 20,
-    })
-    
-    this.anims.remove('fall');
-		this.anims.create({
-			key: 'fall',
-			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 20, end: 23 }),
-      frameRate: 20,
-		})
-    
-    this.anims.remove('die');
-		this.anims.create({
-			key: 'die',
-			frames: this.anims.generateFrameNumbers(KEYS.DUDE, { start: 24, end: 31 }),
-      frameRate: 10,
-		})
-
-    this.playerTween = this.tweens.addCounter({
-      from: 50,
-      to: 205,
-      duration: 150,
-      yoyo: true,
-      repeat: -1,
-      onUpdate: (tween) =>
-      {
-        const value = Math.floor(tween.getValue());
-        this.player.setTint(Phaser.Display.Color.GetColor(255, 255, value));
-      },
-      onStop: (tween) => {
-        this.player.clearTint();
-      }
-    });
-
-    this.playerTween.stop();
+    this.player = new PlayerController( this.physics.add.sprite(100, 450, KEYS.DUDE), this, KEYS.DUDE );
   }
 
   createParticles() {
@@ -306,7 +220,7 @@ export default class MainScene extends Phaser.Scene {
   collectStar(player, star){
     star.destroy();
 
-    if( this.playerTween.isPlaying() ){
+    if( this.player.playerTween.isPlaying() ){
       return;
     }
 
@@ -317,7 +231,7 @@ export default class MainScene extends Phaser.Scene {
     this.superStar = 10;
     this.energyMask.x = this.energyContainer.x + 23;
     
-    this.playerTween.play();
+    this.player.playerTween.play();
     this.superStarInterval = setInterval(() => {
       if( this.superStar > 0 ){
         let stepLengh = this.energyMask.displayWidth / 10;
@@ -327,7 +241,7 @@ export default class MainScene extends Phaser.Scene {
       }
 
       this.superStar = 0;
-      this.playerTween.stop();
+      this.player.playerTween.stop();
       clearInterval(this.superStarInterval);
     }, 1000);
     
@@ -351,7 +265,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   hitBomb(player, bomb){
-    if( this.playerTween.isPlaying() || bomb.anims.getName() == 'bomb-alt' ){
+    if( this.player.playerTween.isPlaying() || bomb.anims.getName() == 'bomb-alt' ){
       bomb.destroy();
       this.addScore(20);
       return;
@@ -370,7 +284,7 @@ export default class MainScene extends Phaser.Scene {
     this.playerPlatformCollider.destroy();
     this.playerBombsCollider.destroy();
     this.playerCupcakesOverlap.destroy();
-    this.player.setCollideWorldBounds(false);
+    this.player.player.setCollideWorldBounds(false);
     this.gameOver = true;
     this.gamerOverLabel.setVisible(true);
   }
