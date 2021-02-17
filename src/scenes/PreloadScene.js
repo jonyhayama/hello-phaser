@@ -81,34 +81,19 @@ export default class PreloadScene extends Phaser.Scene {
 
     this.player = new PlayerController( ( 85 + 128), 290, this, 'dude' );
     this.player.sprite.body.allowGravity = false;
-    this.anims.create({
-			key: 'select-idle',
-			frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    })
+    this.player.createAnims(['idle']);
     this.player.sprite.setScale(2).refreshBody();
     this.player.sprite.setDepth(1);
 
     this.player2 = new PlayerController( ( 85 + 320), 290, this, 'dude2' );
     this.player2.sprite.body.allowGravity = false;
-    this.anims.create({
-			key: 'select-idle2',
-			frames: this.anims.generateFrameNumbers('dude2', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    })
+    this.player2.createAnims(['idle']);
     this.player2.sprite.setScale(2).refreshBody();
     this.player2.sprite.setDepth(1);
 
     this.player3 = new PlayerController( ( 85 + 512), 290, this, 'dude3' );
     this.player3.sprite.body.allowGravity = false;
-    this.anims.create({
-			key: 'select-idle3',
-			frames: this.anims.generateFrameNumbers('dude3', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    })
+    this.player3.createAnims(['idle']);
     this.player3.sprite.setScale(2).refreshBody();
     this.player3.sprite.setDepth(1);
 
@@ -138,15 +123,15 @@ export default class PreloadScene extends Phaser.Scene {
 
     switch( this.selected ){
       case 1:
-        this.player.sprite.anims.play('select-idle');
+        this.player.sprite.anims.play(this.player.keys.idle);
         this.graphics.anims.play('selected');
         break;
       case 2: 
-        this.player2.sprite.anims.play('select-idle2');
+        this.player2.sprite.anims.play(this.player2.keys.idle);
         this.graphics2.anims.play('selected');
         break;
       case 3: 
-        this.player3.sprite.anims.play('select-idle3');
+        this.player3.sprite.anims.play(this.player3.keys.idle);
         this.graphics3.anims.play('selected');
         break;
     }

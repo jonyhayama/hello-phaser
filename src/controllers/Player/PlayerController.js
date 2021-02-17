@@ -47,61 +47,75 @@ export default class PlayerController {
     this.cursors = this.scene.input.keyboard.createCursorKeys();
   }
 
-  createAnims(){
-    this.scene.anims.remove(this.keys.run);
-		this.scene.anims.create({
-			key: this.keys.run,
-			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 8, end: 13 }),
-			frameRate: 10,
-			repeat: -1
-		})
+  createAnims(only = []){
+    only = (only.length === 0) ? ['run', 'idle', 'jump', 'fall', 'die', 'superstar'] : only;
 
-    this.scene.anims.remove(this.keys.idle);
-		this.scene.anims.create({
-			key: this.keys.idle,
-			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-		})
-    
-    this.scene.anims.remove(this.keys.jump);
-		this.scene.anims.create({
-			key: this.keys.jump,
-			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 16, end: 19 }),
-      frameRate: 20,
-    })
-    
-    this.scene.anims.remove(this.keys.fall);
-		this.scene.anims.create({
-			key: this.keys.fall,
-			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 20, end: 23 }),
-      frameRate: 20,
-		})
-    
-    this.scene.anims.remove(this.keys.die);
-		this.scene.anims.create({
-			key: this.keys.die,
-			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 24, end: 31 }),
-      frameRate: 10,
-		})
+    if( only.includes('run') ){
+      this.scene.anims.remove(this.keys.run);
+      this.scene.anims.create({
+        key: this.keys.run,
+        frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 8, end: 13 }),
+        frameRate: 10,
+        repeat: -1
+      })
+    }
 
-    this.tween = this.scene.tweens.addCounter({
-      from: 50,
-      to: 205,
-      duration: 150,
-      yoyo: true,
-      repeat: -1,
-      onUpdate: (tween) =>
-      {
-        const value = Math.floor(tween.getValue());
-        this.sprite.setTint(Phaser.Display.Color.GetColor(255, 255, value));
-      },
-      onStop: (tween) => {
-        this.sprite.clearTint();
-      }
-    });
+    if( only.includes('idle') ){
+      this.scene.anims.remove(this.keys.idle);
+      this.scene.anims.create({
+        key: this.keys.idle,
+        frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      })
+    }
+    
+    if( only.includes('jump') ){
+      this.scene.anims.remove(this.keys.jump);
+      this.scene.anims.create({
+        key: this.keys.jump,
+        frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 16, end: 19 }),
+        frameRate: 20,
+      })
+    }
+    
+    if( only.includes('fall') ){
+      this.scene.anims.remove(this.keys.fall);
+      this.scene.anims.create({
+        key: this.keys.fall,
+        frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 20, end: 23 }),
+        frameRate: 20,
+      })
+    }
+    
+    if( only.includes('die') ){
+      this.scene.anims.remove(this.keys.die);
+      this.scene.anims.create({
+        key: this.keys.die,
+        frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 24, end: 31 }),
+        frameRate: 10,
+      })
+    }
 
-    this.tween.stop();
+    if( only.includes('superstar') ){
+      this.tween = this.scene.tweens.addCounter({
+        from: 50,
+        to: 205,
+        duration: 150,
+        yoyo: true,
+        repeat: -1,
+        onUpdate: (tween) =>
+        {
+          const value = Math.floor(tween.getValue());
+          this.sprite.setTint(Phaser.Display.Color.GetColor(255, 255, value));
+        },
+        onStop: (tween) => {
+          this.sprite.clearTint();
+        }
+      });
+
+      this.tween.stop();
+    }
   }
 
   update(){
