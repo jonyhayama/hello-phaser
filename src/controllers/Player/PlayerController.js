@@ -1,15 +1,15 @@
 export default class PlayerController {
   /**
-   * @param {Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} player
+   * @param {Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} sprite
    * @param {Phaser.Scene} scene
    * @param {string} key
    */
-  constructor(player, scene, key) {
+  constructor(sprite, scene, key) {
     this.key = key;
-    this.player = player;
-    this.player.setCircle(13, 2, 5);
-		this.player.setBounce(0.2)
-		this.player.setCollideWorldBounds(true)
+    this.sprite = sprite;
+    this.sprite.setCircle(13, 2, 5);
+		this.sprite.setBounce(0.2)
+		this.sprite.setCollideWorldBounds(true)
 
     this.scene = scene;
     this.createControllers();
@@ -58,7 +58,7 @@ export default class PlayerController {
       frameRate: 10,
 		})
 
-    this.playerTween = this.scene.tweens.addCounter({
+    this.tween = this.scene.tweens.addCounter({
       from: 50,
       to: 205,
       duration: 150,
@@ -67,46 +67,46 @@ export default class PlayerController {
       onUpdate: (tween) =>
       {
         const value = Math.floor(tween.getValue());
-        this.player.setTint(Phaser.Display.Color.GetColor(255, 255, value));
+        this.sprite.setTint(Phaser.Display.Color.GetColor(255, 255, value));
       },
       onStop: (tween) => {
-        this.player.clearTint();
+        this.sprite.clearTint();
       }
     });
 
-    this.playerTween.stop();
+    this.tween.stop();
   }
 
   update(){
-    if( !this.player.body.touching.down ) {
-      if( this.player.body.velocity.y < 0 ){
-        this.player.anims.play('jump', true);
+    if( !this.sprite.body.touching.down ) {
+      if( this.sprite.body.velocity.y < 0 ){
+        this.sprite.anims.play('jump', true);
       } else {
-        this.player.anims.play('fall', true);
+        this.sprite.anims.play('fall', true);
       }
     } else {
       if(this.cursors.up.isDown || this.cursors.space.isDown){
-        this.player.anims.play('idle', true);
-        this.player.setVelocityY(-330);
+        this.sprite.anims.play('idle', true);
+        this.sprite.setVelocityY(-330);
       }
 
       if( this.cursors.left.isDown ){
-        this.player.anims.play('run', true);
+        this.sprite.anims.play('run', true);
       } else if ( this.cursors.right.isDown ){
-        this.player.anims.play('run', true);
+        this.sprite.anims.play('run', true);
       } else {
-        this.player.anims.play('idle', true);
+        this.sprite.anims.play('idle', true);
       }
     }
 
     if( this.cursors.left.isDown ){
-      this.player.flipX = true;
-      this.player.setVelocityX(-160);
+      this.sprite.flipX = true;
+      this.sprite.setVelocityX(-160);
     } else if ( this.cursors.right.isDown ){
-      this.player.flipX = false;
-      this.player.setVelocityX(160);
+      this.sprite.flipX = false;
+      this.sprite.setVelocityX(160);
     } else {
-      this.player.setVelocityX(0);
+      this.sprite.setVelocityX(0);
     }
   }
 }

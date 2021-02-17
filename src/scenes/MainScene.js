@@ -96,9 +96,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createColliders(){
-    this.playerPlatformCollider = this.physics.add.collider(this.player.player, this.platforms);
-    this.playerBombsCollider = this.physics.add.collider(this.player.player, this.bombSpawner.group, this.hitBomb, null, this);
-    this.playerStarsCollider = this.physics.add.collider(this.player.player, this.starSpawner.group, this.collectStar, null, this);
+    this.playerPlatformCollider = this.physics.add.collider(this.player.sprite, this.platforms);
+    this.playerBombsCollider = this.physics.add.collider(this.player.sprite, this.bombSpawner.group, this.hitBomb, null, this);
+    this.playerStarsCollider = this.physics.add.collider(this.player.sprite, this.starSpawner.group, this.collectStar, null, this);
     this.BombsBombsCollider = this.physics.add.collider(this.bombSpawner.group, this.bombSpawner.group, null, null, this);
     this.StarsStarsCollider = this.physics.add.collider(this.starSpawner.group, this.starSpawner.group, null, null, this);
     this.BombsStarsCollider = this.physics.add.collider(this.bombSpawner.group, this.starSpawner.group, null, null, this);
@@ -106,7 +106,7 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.bombSpawner.group, this.platforms);
     this.physics.add.collider(this.starSpawner.group, this.platforms);
 
-    this.playerCupcakesOverlap = this.physics.add.overlap(this.player.player, this.cupcakes, this.collectCupcake, null, this);
+    this.playerCupcakesOverlap = this.physics.add.overlap(this.player.sprite, this.cupcakes, this.collectCupcake, null, this);
   }
 
   createStars(){
@@ -220,7 +220,7 @@ export default class MainScene extends Phaser.Scene {
   collectStar(player, star){
     star.destroy();
 
-    if( this.player.playerTween.isPlaying() ){
+    if( this.player.tween.isPlaying() ){
       return;
     }
 
@@ -231,7 +231,7 @@ export default class MainScene extends Phaser.Scene {
     this.superStar = 10;
     this.energyMask.x = this.energyContainer.x + 23;
     
-    this.player.playerTween.play();
+    this.player.tween.play();
     this.superStarInterval = setInterval(() => {
       if( this.superStar > 0 ){
         let stepLengh = this.energyMask.displayWidth / 10;
@@ -241,7 +241,7 @@ export default class MainScene extends Phaser.Scene {
       }
 
       this.superStar = 0;
-      this.player.playerTween.stop();
+      this.player.tween.stop();
       clearInterval(this.superStarInterval);
     }, 1000);
     
@@ -265,7 +265,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   hitBomb(player, bomb){
-    if( this.player.playerTween.isPlaying() || bomb.anims.getName() == 'bomb-alt' ){
+    if( this.player.tween.isPlaying() || bomb.anims.getName() == 'bomb-alt' ){
       bomb.destroy();
       this.addScore(20);
       return;
@@ -284,7 +284,7 @@ export default class MainScene extends Phaser.Scene {
     this.playerPlatformCollider.destroy();
     this.playerBombsCollider.destroy();
     this.playerCupcakesOverlap.destroy();
-    this.player.player.setCollideWorldBounds(false);
+    this.player.sprite.setCollideWorldBounds(false);
     this.gameOver = true;
     this.gamerOverLabel.setVisible(true);
   }
