@@ -6,9 +6,16 @@ export default class PlayerController {
    * @param {string} key
    */
   constructor(x, y, scene, key) {
-    this.key = key;
-    
-    this.sprite = scene.physics.add.sprite(x, y, this.key);
+    this.keys = {
+      sprite: key,
+      idle: `${key}-idle`,
+      run: `${key}-run`,
+      jump: `${key}-jump`,
+      fall: `${key}-fall`,
+      die: `${key}-die`,
+    }
+
+    this.sprite = scene.physics.add.sprite(x, y, this.keys.sprite);
     this.sprite.setCircle(13, 2, 5);
 		this.sprite.setBounce(0.2)
 		this.sprite.setCollideWorldBounds(true)
@@ -41,40 +48,40 @@ export default class PlayerController {
   }
 
   createAnims(){
-    this.scene.anims.remove('run');
+    this.scene.anims.remove(this.keys.run);
 		this.scene.anims.create({
-			key: 'run',
-			frames: this.scene.anims.generateFrameNumbers(this.key, { start: 8, end: 13 }),
+			key: this.keys.run,
+			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 8, end: 13 }),
 			frameRate: 10,
 			repeat: -1
 		})
 
-    this.scene.anims.remove('idle');
+    this.scene.anims.remove(this.keys.idle);
 		this.scene.anims.create({
-			key: 'idle',
-			frames: this.scene.anims.generateFrameNumbers(this.key, { start: 0, end: 3 }),
+			key: this.keys.idle,
+			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1
 		})
     
-    this.scene.anims.remove('jump');
+    this.scene.anims.remove(this.keys.jump);
 		this.scene.anims.create({
-			key: 'jump',
-			frames: this.scene.anims.generateFrameNumbers(this.key, { start: 16, end: 19 }),
+			key: this.keys.jump,
+			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 16, end: 19 }),
       frameRate: 20,
     })
     
-    this.scene.anims.remove('fall');
+    this.scene.anims.remove(this.keys.fall);
 		this.scene.anims.create({
-			key: 'fall',
-			frames: this.scene.anims.generateFrameNumbers(this.key, { start: 20, end: 23 }),
+			key: this.keys.fall,
+			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 20, end: 23 }),
       frameRate: 20,
 		})
     
-    this.scene.anims.remove('die');
+    this.scene.anims.remove(this.keys.die);
 		this.scene.anims.create({
-			key: 'die',
-			frames: this.scene.anims.generateFrameNumbers(this.key, { start: 24, end: 31 }),
+			key: this.keys.die,
+			frames: this.scene.anims.generateFrameNumbers(this.keys.sprite, { start: 24, end: 31 }),
       frameRate: 10,
 		})
 
@@ -100,22 +107,22 @@ export default class PlayerController {
   update(){
     if( !this.sprite.body.touching.down ) {
       if( this.sprite.body.velocity.y < 0 ){
-        this.sprite.anims.play('jump', true);
+        this.sprite.anims.play(this.keys.jump, true);
       } else {
-        this.sprite.anims.play('fall', true);
+        this.sprite.anims.play(this.keys.fall, true);
       }
     } else {
       if(this.cursors.up.isDown || this.cursors.space.isDown){
-        this.sprite.anims.play('idle', true);
+        this.sprite.anims.play(this.keys.idle, true);
         this.sprite.setVelocityY(-330);
       }
 
       if( this.cursors.left.isDown ){
-        this.sprite.anims.play('run', true);
+        this.sprite.anims.play(this.keys.run, true);
       } else if ( this.cursors.right.isDown ){
-        this.sprite.anims.play('run', true);
+        this.sprite.anims.play(this.keys.run, true);
       } else {
-        this.sprite.anims.play('idle', true);
+        this.sprite.anims.play(this.keys.idle, true);
       }
     }
 
