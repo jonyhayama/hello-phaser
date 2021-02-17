@@ -16,6 +16,26 @@ export default class PlayerController {
     this.createAnims();
   }
 
+  /**
+   * @param {Phaser.Scene} scene
+   */
+  static loadSpritesheets(scene){
+    scene.load.spritesheet('dude', 'assets/img/pink-monster.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
+    scene.load.spritesheet('dude2', 'assets/img/owlet-monster.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
+    scene.load.spritesheet('dude3', 'assets/img/dude-monster.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+  }
+
   createControllers(){
     this.cursors = this.scene.input.keyboard.createCursorKeys();
   }

@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import PlayerController from '../controllers/Player/PlayerController'
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -11,20 +12,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('sky', 'assets/img/sky.png');
     this.load.image('logo', 'assets/img/hello-phaser-logo.png');
 
-    this.load.spritesheet('dude', 'assets/img/pink-monster.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    });
-
-    this.load.spritesheet('dude2', 'assets/img/owlet-monster.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    });
-
-    this.load.spritesheet('dude3', 'assets/img/dude-monster.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    });
+    PlayerController.loadSpritesheets(this);
 
     this.load.spritesheet('selector', 'assets/img/player-selector.png', {
       frameWidth: 128,
