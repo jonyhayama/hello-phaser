@@ -273,9 +273,10 @@ export default class MainScene extends Phaser.Scene {
       return;
     }
 
-    player.anims.play(this.player.keys.die);
+    const die_key = this.player.keys.die;
+    player.anims.play(die_key);
     player.on('animationcomplete', function(evt){
-      if( evt.key == this.player.keys.die ){
+      if( evt.key == die_key ){
         this.disableBody(true, true);
       }
     })
