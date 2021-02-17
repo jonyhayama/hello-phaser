@@ -1,19 +1,19 @@
 export default class PlayerController {
   /**
-   * @param {Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} sprite
+   * @param {Number} x
+   * @param {Number} y
    * @param {Phaser.Scene} scene
    * @param {string} key
    */
-  constructor(sprite, scene, key) {
+  constructor(x, y, scene, key) {
     this.key = key;
-    this.sprite = sprite;
+    
+    this.sprite = scene.physics.add.sprite(x, y, this.key);
     this.sprite.setCircle(13, 2, 5);
 		this.sprite.setBounce(0.2)
 		this.sprite.setCollideWorldBounds(true)
 
     this.scene = scene;
-    this.createControllers();
-    this.createAnims();
   }
 
   /**

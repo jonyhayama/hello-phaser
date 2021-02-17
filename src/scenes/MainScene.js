@@ -154,7 +154,9 @@ export default class MainScene extends Phaser.Scene {
         break;
     }
     
-    this.player = new PlayerController( this.physics.add.sprite(100, 450, KEYS.DUDE), this, KEYS.DUDE );
+    this.player = new PlayerController( 100, 450, this, KEYS.DUDE );
+    this.player.createControllers();
+    this.player.createAnims();
   }
 
   createParticles() {

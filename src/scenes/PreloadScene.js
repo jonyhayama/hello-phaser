@@ -79,38 +79,38 @@ export default class PreloadScene extends Phaser.Scene {
       this.setMenuItem(itemIdx);
     });
 
-    this.player = this.physics.add.sprite( ( 85 + 128), 290, 'dude')
-    this.player.body.allowGravity = false;
+    this.player = new PlayerController( ( 85 + 128), 290, this, 'dude' );
+    this.player.sprite.body.allowGravity = false;
     this.anims.create({
 			key: 'select-idle',
 			frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1
     })
-    this.player.setScale(2).refreshBody();
-    this.player.setDepth(1);
+    this.player.sprite.setScale(2).refreshBody();
+    this.player.sprite.setDepth(1);
 
-    this.player2 = this.physics.add.sprite( ( 85 + 320), 290, 'dude2')
-    this.player2.body.allowGravity = false;
+    this.player2 = new PlayerController( ( 85 + 320), 290, this, 'dude2' );
+    this.player2.sprite.body.allowGravity = false;
     this.anims.create({
 			key: 'select-idle2',
 			frames: this.anims.generateFrameNumbers('dude2', { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1
     })
-    this.player2.setScale(2).refreshBody();
-    this.player2.setDepth(1);
+    this.player2.sprite.setScale(2).refreshBody();
+    this.player2.sprite.setDepth(1);
 
-    this.player3 = this.physics.add.sprite( ( 85 + 512), 290, 'dude3')
-    this.player3.body.allowGravity = false;
+    this.player3 = new PlayerController( ( 85 + 512), 290, this, 'dude3' );
+    this.player3.sprite.body.allowGravity = false;
     this.anims.create({
 			key: 'select-idle3',
 			frames: this.anims.generateFrameNumbers('dude3', { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1
     })
-    this.player3.setScale(2).refreshBody();
-    this.player3.setDepth(1);
+    this.player3.sprite.setScale(2).refreshBody();
+    this.player3.sprite.setDepth(1);
 
     this.graphics = this.physics.add.sprite( ( 85 + 128), 290, 'selector');
     this.graphics.body.allowGravity = false;
@@ -127,26 +127,26 @@ export default class PreloadScene extends Phaser.Scene {
   setSelected( playerIdx ){
     
     this.selected = playerIdx;
-    this.player.anims.stop();
+    this.player.sprite.anims.stop();
     this.graphics.anims.play('not-selected');
     
-    this.player2.anims.stop();
+    this.player2.sprite.anims.stop();
     this.graphics2.anims.play('not-selected');
     
-    this.player3.anims.stop();
+    this.player3.sprite.anims.stop();
     this.graphics3.anims.play('not-selected');
 
     switch( this.selected ){
       case 1:
-        this.player.anims.play('select-idle');
+        this.player.sprite.anims.play('select-idle');
         this.graphics.anims.play('selected');
         break;
       case 2: 
-        this.player2.anims.play('select-idle2');
+        this.player2.sprite.anims.play('select-idle2');
         this.graphics2.anims.play('selected');
         break;
       case 3: 
-        this.player3.anims.play('select-idle3');
+        this.player3.sprite.anims.play('select-idle3');
         this.graphics3.anims.play('selected');
         break;
     }
