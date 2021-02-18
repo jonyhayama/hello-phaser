@@ -142,19 +142,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createPlayer(){
-    switch( this.scene.get('preload-scene').selected ){
-      case 1:
-        KEYS.DUDE = 'dude'
-        break;
-      case 2:
-        KEYS.DUDE = 'dude2'
-        break;
-      case 3:
-        KEYS.DUDE = 'dude3'
-        break;
-    }
+    const selectedPlayer = PlayerController.availableCharacters[this.scene.get('preload-scene').selected - 1];
     
-    this.player = new PlayerController( 100, 450, this, KEYS.DUDE );
+    this.player = new PlayerController( 100, 450, this, selectedPlayer.key );
     this.player.createControllers();
     this.player.createAnims();
   }
