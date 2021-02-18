@@ -90,7 +90,7 @@ export default class PreloadScene extends Phaser.Scene {
     });
 
     this.input.keyboard.on('keyup-' + 'RIGHT', (event) => { 
-      let playerIdx = Math.min((this.selected + 1), 3);
+      let playerIdx = Math.min((this.selected + 1), Object.keys(this.players).length);
       this.setSelected(playerIdx);
     });
 
