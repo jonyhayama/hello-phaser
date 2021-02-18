@@ -1,4 +1,25 @@
 export default class PlayerController {
+  static availableCharacters = [
+    {
+      key: 'dude',
+      sprite: 'assets/img/pink-monster.png',
+      frameWidth: 32,
+      frameHeight: 32
+    },
+    {
+      key: 'dude2',
+      sprite: 'assets/img/owlet-monster.png',
+      frameWidth: 32,
+      frameHeight: 32
+    },
+    {
+      key: 'dude3',
+      sprite: 'assets/img/dude-monster.png',
+      frameWidth: 32,
+      frameHeight: 32
+    },
+  ]
+
   /**
    * @param {Number} x
    * @param {Number} y
@@ -27,19 +48,11 @@ export default class PlayerController {
    * @param {Phaser.Scene} scene
    */
   static loadSpritesheets(scene){
-    scene.load.spritesheet('dude', 'assets/img/pink-monster.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    });
-
-    scene.load.spritesheet('dude2', 'assets/img/owlet-monster.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    });
-
-    scene.load.spritesheet('dude3', 'assets/img/dude-monster.png', {
-      frameWidth: 32,
-      frameHeight: 32
+    this.availableCharacters.forEach(character => {
+      scene.load.spritesheet(character.key, character.sprite, {
+        frameWidth: character.frameWidth,
+        frameHeight: character.frameHeight
+      });
     });
   }
 

@@ -6,6 +6,7 @@ export default class PreloadScene extends Phaser.Scene {
     super('preload-scene')
     this.selected = 1;
     this.menuItem = 1;
+    this.players = {};
   }
 
   preload() {
@@ -79,23 +80,14 @@ export default class PreloadScene extends Phaser.Scene {
       this.setMenuItem(itemIdx);
     });
 
-    this.player = new PlayerController( ( 85 + 128), 290, this, 'dude' );
-    this.player.sprite.body.allowGravity = false;
-    this.player.createAnims(['idle']);
-    this.player.sprite.setScale(2).refreshBody();
-    this.player.sprite.setDepth(1);
-
-    this.player2 = new PlayerController( ( 85 + 320), 290, this, 'dude2' );
-    this.player2.sprite.body.allowGravity = false;
-    this.player2.createAnims(['idle']);
-    this.player2.sprite.setScale(2).refreshBody();
-    this.player2.sprite.setDepth(1);
-
-    this.player3 = new PlayerController( ( 85 + 512), 290, this, 'dude3' );
-    this.player3.sprite.body.allowGravity = false;
-    this.player3.createAnims(['idle']);
-    this.player3.sprite.setScale(2).refreshBody();
-    this.player3.sprite.setDepth(1);
+    PlayerController.availableCharacters.forEach((character, index) => {
+      const x = index * 192 + 128 + 85;
+      this.players[character.key] = new PlayerController( x, 290, this, character.key );
+      this.players[character.key].sprite.body.allowGravity = false;
+      this.players[character.key].createAnims(['idle']);
+      this.players[character.key].sprite.setScale(2).refreshBody();
+      this.players[character.key].sprite.setDepth(1);
+    });
 
     this.graphics = this.physics.add.sprite( ( 85 + 128), 290, 'selector');
     this.graphics.body.allowGravity = false;
@@ -112,26 +104,26 @@ export default class PreloadScene extends Phaser.Scene {
   setSelected( playerIdx ){
     
     this.selected = playerIdx;
-    this.player.sprite.anims.stop();
+    this.players['dude'].sprite.anims.stop();
     this.graphics.anims.play('not-selected');
     
-    this.player2.sprite.anims.stop();
+    this.players['dude2'].sprite.anims.stop();
     this.graphics2.anims.play('not-selected');
     
-    this.player3.sprite.anims.stop();
+    this.players['dude3'].sprite.anims.stop();
     this.graphics3.anims.play('not-selected');
 
     switch( this.selected ){
       case 1:
-        this.player.sprite.anims.play(this.player.keys.idle);
+        this.players['dude'].sprite.anims.play(this.players['dude'].keys.idle);
         this.graphics.anims.play('selected');
         break;
       case 2: 
-        this.player2.sprite.anims.play(this.player2.keys.idle);
+        this.players['dude2'].sprite.anims.play(this.players['dude2'].keys.idle);
         this.graphics2.anims.play('selected');
         break;
       case 3: 
-        this.player3.sprite.anims.play(this.player3.keys.idle);
+        this.players['dude3'].sprite.anims.play(this.players['dude3'].keys.idle);
         this.graphics3.anims.play('selected');
         break;
     }
