@@ -23,9 +23,35 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   create() {
+    this.addStaticElements();
+    this.createAnims();
+    this.createMenuLabels();
+    this.setMenuItem( this.menuItem );
+    this.createControllers();
+    this.createCharactersMenu();
+    this.setSelected( this.selected );
+  }
+
+  addStaticElements(){
     this.add.image(400, 300, 'sky');
     this.add.image(400, 150, 'logo');
+  }
 
+  createCharactersMenu(){
+    PlayerController.availableCharacters.forEach((character, index) => {
+      const x = index * 192 + 128 + 85;
+      this.players[character.key] = new PlayerController( x, 290, this, character.key );
+      this.players[character.key].sprite.body.allowGravity = false;
+      this.players[character.key].createAnims(['idle']);
+      this.players[character.key].sprite.setScale(2).refreshBody();
+      this.players[character.key].sprite.setDepth(1);
+
+      this.graphics[character.key] = this.physics.add.sprite( x, 290, 'selector');
+      this.graphics[character.key].body.allowGravity = false;
+    });
+  }
+
+  createMenuLabels(){
     let textStyle = { fontSize: '32px', fill: '#fff', padding: 10, fontStyle: 'bold' };
 
     this.startGameLabel = this.add.text(400, 420, 'Start Game', textStyle);
@@ -33,9 +59,9 @@ export default class PreloadScene extends Phaser.Scene {
 
     this.optionsLabel = this.add.text(400, ( 420 + this.startGameLabel.height ) , 'Options', textStyle);
     this.optionsLabel.setOrigin(0.5);
+  }
 
-    this.setMenuItem( this.menuItem );
-
+  createAnims(){
     this.anims.create({
 			key: 'selected',
 			frames: [ { key: 'selector', frame: 1 } ],
@@ -48,7 +74,9 @@ export default class PreloadScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     })
-    
+  }
+
+  createControllers(){
     this.input.keyboard.addCapture('SPACE');
     this.input.keyboard.on('keyup-' + 'SPACE', (event) => { 
       switch( this.menuItem ){
@@ -80,24 +108,9 @@ export default class PreloadScene extends Phaser.Scene {
       let itemIdx = Math.max((this.menuItem - 1), 1);
       this.setMenuItem(itemIdx);
     });
-
-    PlayerController.availableCharacters.forEach((character, index) => {
-      const x = index * 192 + 128 + 85;
-      this.players[character.key] = new PlayerController( x, 290, this, character.key );
-      this.players[character.key].sprite.body.allowGravity = false;
-      this.players[character.key].createAnims(['idle']);
-      this.players[character.key].sprite.setScale(2).refreshBody();
-      this.players[character.key].sprite.setDepth(1);
-
-      this.graphics[character.key] = this.physics.add.sprite( x, 290, 'selector');
-      this.graphics[character.key].body.allowGravity = false;
-    });
-
-    this.setSelected( this.selected );
   }
 
   setSelected( playerIdx ){
-    
     this.selected = playerIdx;
 
     const playerKeys = Object.keys(this.players);
