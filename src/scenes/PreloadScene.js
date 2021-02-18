@@ -7,6 +7,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.selected = 1;
     this.menuItem = 1;
     this.players = {};
+    this.graphics = {};
   }
 
   preload() {
@@ -87,16 +88,10 @@ export default class PreloadScene extends Phaser.Scene {
       this.players[character.key].createAnims(['idle']);
       this.players[character.key].sprite.setScale(2).refreshBody();
       this.players[character.key].sprite.setDepth(1);
+
+      this.graphics[character.key] = this.physics.add.sprite( x, 290, 'selector');
+      this.graphics[character.key].body.allowGravity = false;
     });
-
-    this.graphics = this.physics.add.sprite( ( 85 + 128), 290, 'selector');
-    this.graphics.body.allowGravity = false;
-
-    this.graphics2 = this.physics.add.sprite( ( 85 + 320), 290, 'selector');
-    this.graphics2.body.allowGravity = false;
-
-    this.graphics3 = this.physics.add.sprite( ( 85 + 512), 290, 'selector');
-    this.graphics3.body.allowGravity = false;
 
     this.setSelected( this.selected );
   }
@@ -104,29 +99,16 @@ export default class PreloadScene extends Phaser.Scene {
   setSelected( playerIdx ){
     
     this.selected = playerIdx;
-    this.players['dude'].sprite.anims.stop();
-    this.graphics.anims.play('not-selected');
-    
-    this.players['dude2'].sprite.anims.stop();
-    this.graphics2.anims.play('not-selected');
-    
-    this.players['dude3'].sprite.anims.stop();
-    this.graphics3.anims.play('not-selected');
 
-    switch( this.selected ){
-      case 1:
-        this.players['dude'].sprite.anims.play(this.players['dude'].keys.idle);
-        this.graphics.anims.play('selected');
-        break;
-      case 2: 
-        this.players['dude2'].sprite.anims.play(this.players['dude2'].keys.idle);
-        this.graphics2.anims.play('selected');
-        break;
-      case 3: 
-        this.players['dude3'].sprite.anims.play(this.players['dude3'].keys.idle);
-        this.graphics3.anims.play('selected');
-        break;
-    }
+    const playerKeys = Object.keys(this.players);
+    const selectedKey = playerKeys[playerIdx - 1];
+    playerKeys.forEach((playerKey) => {
+      this.players[playerKey].sprite.anims.stop();
+      this.graphics[playerKey].anims.play('not-selected');
+    })
+    
+    this.players[selectedKey].sprite.anims.play(this.players[selectedKey].keys.idle);
+    this.graphics[selectedKey].anims.play('selected');
   }
   
   setMenuItem( itemIdx ){
