@@ -29,7 +29,7 @@ export default class MainScene extends Phaser.Scene {
     this.playerCupcakesOverlap = undefined;
     this.platforms = undefined;
     
-    this.gameOver = false;
+    this.isGameOver = false;
   }
 
   preload() {
@@ -61,7 +61,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
-    if( this.gameOver ){
+    if( this.isGameOver ){
       return;
     }
 
@@ -70,18 +70,13 @@ export default class MainScene extends Phaser.Scene {
 
   createConrollers(){
     this.input.keyboard.on('keyup-' + 'ESC', (event) => { 
-      this.gameOver = false;
-      this.setScore(0);
-      this.scene.restart();
+      this.restartGame();
       this.scene.start('preload-scene');
     } );
 
     this.input.keyboard.on('keyup-' + 'SPACE', (event) => { 
-      if( this.gameOver ){
-        this.gameOver = false;
-        this.gamerOverLabel.setVisible(false);
-        this.setScore(0);
-        this.scene.restart();
+      if( this.isGameOver ){
+        this.restartGame();
       }
     } );
   }
@@ -215,6 +210,10 @@ export default class MainScene extends Phaser.Scene {
       return;
     }
 
+    this.playGameOver(player, bomb);
+  }
+
+  playGameOver(player, bomb){
     this.player.die(player);
     bomb.body.stop();
     bomb.body.allowGravity = false;
@@ -222,8 +221,15 @@ export default class MainScene extends Phaser.Scene {
     this.playerBombsCollider.destroy();
     this.playerStarsCollider.destroy();
     this.playerCupcakesOverlap.destroy();
-    this.gameOver = true;
+    this.isGameOver = true;
     this.gamerOverLabel.setVisible(true);
+  }
+
+  restartGame(){
+    this.isGameOver = false;
+    this.gamerOverLabel.setVisible(false);
+    this.setScore(0);
+    this.scene.restart();
   }
 
   addScore(score){
