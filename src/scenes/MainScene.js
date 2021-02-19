@@ -215,15 +215,7 @@ export default class MainScene extends Phaser.Scene {
       return;
     }
 
-    const die_key = this.player.keys.die;
-    player.anims.play(die_key);
-    player.on('animationcomplete', function(evt){
-      if( evt.key == die_key ){
-        this.disableBody(true, true);
-      }
-    })
-    player.body.stop();
-    player.body.allowGravity = false;
+    this.player.die(player);
     bomb.body.stop();
     bomb.body.allowGravity = false;
     this.playerPlatformCollider.destroy();

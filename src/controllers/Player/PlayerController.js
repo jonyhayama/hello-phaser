@@ -163,4 +163,16 @@ export default class PlayerController {
       this.sprite.setVelocityX(0);
     }
   }
+
+  die(player){
+    const die_key = this.keys.die;
+    player.anims.play(die_key);
+    player.on('animationcomplete', function(evt){
+      if( evt.key == die_key ){
+        this.disableBody(true, true);
+      }
+    })
+    player.body.stop();
+    player.body.allowGravity = false;
+  }
 }
