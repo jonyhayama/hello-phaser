@@ -4,6 +4,7 @@ import ItemSpawner from './ItemSpawner'
 import PlayerController from '../controllers/Player/PlayerController'
 import CupcakeController from '../controllers/CupcakeController'
 import BombController from '../controllers/BombController'
+import StarController from '../controllers/StarController'
 
 const KEYS = {
   GROUND: 'ground',
@@ -19,7 +20,6 @@ export default class MainScene extends Phaser.Scene {
     this.cursors = undefined;
     this.scoreLabel = undefined;
     this.cupcakes = undefined
-    this.starSpawner = undefined;
     this.currentScore = 0;
     this.hiScore = Math.max( JSON.parse( localStorage.getItem('@helloPhaser/MainScene/hiScore') ), 0 );
     this.superStar = 10;
@@ -92,19 +92,19 @@ export default class MainScene extends Phaser.Scene {
   createColliders(){
     this.playerPlatformCollider = this.physics.add.collider(this.player.sprite, this.platforms);
     this.playerBombsCollider = this.physics.add.collider(this.player.sprite, this.bombs.spawner.group, this.hitBomb, null, this);
-    this.playerStarsCollider = this.physics.add.collider(this.player.sprite, this.starSpawner.group, this.collectStar, null, this);
+    this.playerStarsCollider = this.physics.add.collider(this.player.sprite, this.stars.spawner.group, this.collectStar, null, this);
     this.BombsBombsCollider = this.physics.add.collider(this.bombs.spawner.group, this.bombs.spawner.group, null, null, this);
-    this.StarsStarsCollider = this.physics.add.collider(this.starSpawner.group, this.starSpawner.group, null, null, this);
-    this.BombsStarsCollider = this.physics.add.collider(this.bombs.spawner.group, this.starSpawner.group, null, null, this);
+    this.StarsStarsCollider = this.physics.add.collider(this.stars.spawner.group, this.stars.spawner.group, null, null, this);
+    this.BombsStarsCollider = this.physics.add.collider(this.bombs.spawner.group, this.stars.spawner.group, null, null, this);
     this.physics.add.collider(this.cupcakes.group, this.platforms);
     this.physics.add.collider(this.bombs.spawner.group, this.platforms);
-    this.physics.add.collider(this.starSpawner.group, this.platforms);
+    this.physics.add.collider(this.stars.spawner.group, this.platforms);
 
     this.playerCupcakesOverlap = this.physics.add.overlap(this.player.sprite, this.cupcakes.group, this.collectCupcake, null, this);
   }
 
   createStars(){
-    this.starSpawner = new ItemSpawner(this, KEYS.STAR, 1);
+    this.stars = new StarController(this);
   }
 
   createBombs(){
@@ -200,7 +200,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.bombs.spawner.spawn(player.x)
 
-    this.starSpawner.spawn(player.x)
+    this.stars.spawner.spawn(player.x)
   }
 
   hitBomb(player, bomb){
