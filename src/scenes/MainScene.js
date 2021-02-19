@@ -2,11 +2,10 @@ import Phaser from 'phaser'
 import ScoreLabel from '../ui/ScoreLabel'
 import ItemSpawner from './ItemSpawner'
 import PlayerController from '../controllers/Player/PlayerController'
+import CupcakeController from '../controllers/CupcakeController'
 
 const KEYS = {
   GROUND: 'ground',
-  DUDE: 'dude',
-  CUPCAKE: 'cupcake',
   BOMB: 'bomb',
   STAR: 'star'
 }
@@ -40,7 +39,7 @@ export default class MainScene extends Phaser.Scene {
     });
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
-    this.load.image(KEYS.CUPCAKE, 'assets/img/cupcake.png');
+    CupcakeController.preloadAssets(this);
     this.load.image(KEYS.STAR, 'assets/img/star.png');
 
     this.load.image("energycontainer", "assets/img/energycontainer.png");
@@ -102,11 +101,11 @@ export default class MainScene extends Phaser.Scene {
     this.BombsBombsCollider = this.physics.add.collider(this.bombSpawner.group, this.bombSpawner.group, null, null, this);
     this.StarsStarsCollider = this.physics.add.collider(this.starSpawner.group, this.starSpawner.group, null, null, this);
     this.BombsStarsCollider = this.physics.add.collider(this.bombSpawner.group, this.starSpawner.group, null, null, this);
-    this.physics.add.collider(this.cupcakes, this.platforms);
+    this.physics.add.collider(this.cupcakes.group, this.platforms);
     this.physics.add.collider(this.bombSpawner.group, this.platforms);
     this.physics.add.collider(this.starSpawner.group, this.platforms);
 
-    this.playerCupcakesOverlap = this.physics.add.overlap(this.player.sprite, this.cupcakes, this.collectCupcake, null, this);
+    this.playerCupcakesOverlap = this.physics.add.overlap(this.player.sprite, this.cupcakes.group, this.collectCupcake, null, this);
   }
 
   createStars(){
@@ -149,17 +148,6 @@ export default class MainScene extends Phaser.Scene {
     this.player.createAnims();
   }
 
-  createParticles() {
-    this.particles = this.add.particles(KEYS.CUPCAKE);
-    this.emitter = this.particles.createEmitter({
-      speed: 200,
-      lifespan: 500,
-      blendMode: 'ADD',
-      scale: { start: 1, end: 0 },
-      on: false
-    })
-  }
-
   createScoreLabel( x, y, score ){
     const style = { fontSize: '32px', fill: '#000' }
     const label = new ScoreLabel( this, x, y, score, style, 'Score: #{score}' );
@@ -179,22 +167,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createCupcakes(){
-    this.cupcakes = this.physics.add.group({
-      key: KEYS.CUPCAKE,
-      repeat: 11,
-      setXY: {
-        x: 12, 
-        y: 0,
-        stepX: 70
-      }
-    });
+    this.cupcakes = new CupcakeController(this);
 
-    this.cupcakes.children.iterate((child) => {
-      child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-      child.setCircle(11, 2, 4);
-    });
-
-    this.createParticles();
+    this.cupcakes.createParticles();
   }
 
   createPowerGauge() {
@@ -240,16 +215,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   collectCupcake(player, cupcake){
-    cupcake.disableBody(true, true);
-    this.particles.emitParticleAt(cupcake.x, cupcake.y, 50);
+    this.cupcakes.collect(cupcake);
+    
     this.addScore(10);
-
-    if( this.cupcakes.countActive(true) === 0 ){
-      //  A new batch of cupcakes to collect
-			this.cupcakes.children.iterate((child) => {
-				child.enableBody(true, child.x, 0, true, true)
-			});
-    }
 
     this.bombSpawner.spawn(player.x)
 
