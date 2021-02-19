@@ -3,6 +3,7 @@ import ScoreLabel from '../ui/ScoreLabel'
 import ItemSpawner from './ItemSpawner'
 import PlayerController from '../controllers/Player/PlayerController'
 import CupcakeController from '../controllers/CupcakeController'
+import BombController from '../controllers/BombController'
 
 const KEYS = {
   GROUND: 'ground',
@@ -18,7 +19,6 @@ export default class MainScene extends Phaser.Scene {
     this.cursors = undefined;
     this.scoreLabel = undefined;
     this.cupcakes = undefined
-    this.bombSpawner = undefined;
     this.starSpawner = undefined;
     this.currentScore = 0;
     this.hiScore = Math.max( JSON.parse( localStorage.getItem('@helloPhaser/MainScene/hiScore') ), 0 );
@@ -96,38 +96,24 @@ export default class MainScene extends Phaser.Scene {
 
   createColliders(){
     this.playerPlatformCollider = this.physics.add.collider(this.player.sprite, this.platforms);
-    this.playerBombsCollider = this.physics.add.collider(this.player.sprite, this.bombSpawner.group, this.hitBomb, null, this);
+    this.playerBombsCollider = this.physics.add.collider(this.player.sprite, this.bombs.spawner.group, this.hitBomb, null, this);
     this.playerStarsCollider = this.physics.add.collider(this.player.sprite, this.starSpawner.group, this.collectStar, null, this);
-    this.BombsBombsCollider = this.physics.add.collider(this.bombSpawner.group, this.bombSpawner.group, null, null, this);
+    this.BombsBombsCollider = this.physics.add.collider(this.bombs.spawner.group, this.bombs.spawner.group, null, null, this);
     this.StarsStarsCollider = this.physics.add.collider(this.starSpawner.group, this.starSpawner.group, null, null, this);
-    this.BombsStarsCollider = this.physics.add.collider(this.bombSpawner.group, this.starSpawner.group, null, null, this);
+    this.BombsStarsCollider = this.physics.add.collider(this.bombs.spawner.group, this.starSpawner.group, null, null, this);
     this.physics.add.collider(this.cupcakes.group, this.platforms);
-    this.physics.add.collider(this.bombSpawner.group, this.platforms);
+    this.physics.add.collider(this.bombs.spawner.group, this.platforms);
     this.physics.add.collider(this.starSpawner.group, this.platforms);
 
     this.playerCupcakesOverlap = this.physics.add.overlap(this.player.sprite, this.cupcakes.group, this.collectCupcake, null, this);
   }
 
   createStars(){
-    this.starSpawner = new ItemSpawner(this, KEYS.STAR, 0.9);
+    this.starSpawner = new ItemSpawner(this, KEYS.STAR, 1);
   }
 
   createBombs(){
-    this.bombSpawner = new ItemSpawner(this, KEYS.BOMB);
-
-    this.anims.create({
-			key: 'bomb-alt',
-			frames: this.anims.generateFrameNumbers(KEYS.BOMB, { start: 1, end: 1 }),
-			frameRate: 10,
-			repeat: -1
-		})
-
-    this.anims.create({
-			key: 'bomb',
-			frames: this.anims.generateFrameNumbers(KEYS.BOMB, { start: 0, end: 0 }),
-			frameRate: 10,
-			repeat: -1
-		})
+    this.bombs = new BombController(this);
   }
 
   createPlatforms(){
@@ -191,9 +177,7 @@ export default class MainScene extends Phaser.Scene {
       return;
     }
 
-    this.bombSpawner.group.children.iterate((child) => {
-      child.anims.play('bomb-alt')
-    });
+    this.bombs.turnIntoCandy();
 
     this.superStar = 10;
     this.energyMask.x = this.energyContainer.x + 23;
@@ -219,13 +203,13 @@ export default class MainScene extends Phaser.Scene {
     
     this.addScore(10);
 
-    this.bombSpawner.spawn(player.x)
+    this.bombs.spawner.spawn(player.x)
 
     this.starSpawner.spawn(player.x)
   }
 
   hitBomb(player, bomb){
-    if( this.player.tween.isPlaying() || bomb.anims.getName() == 'bomb-alt' ){
+    if( this.player.tween.isPlaying() || this.bombs.isCandy(bomb) ){
       bomb.destroy();
       this.addScore(20);
       return;
@@ -244,8 +228,8 @@ export default class MainScene extends Phaser.Scene {
     bomb.body.allowGravity = false;
     this.playerPlatformCollider.destroy();
     this.playerBombsCollider.destroy();
+    this.playerStarsCollider.destroy();
     this.playerCupcakesOverlap.destroy();
-    this.player.sprite.setCollideWorldBounds(false);
     this.gameOver = true;
     this.gamerOverLabel.setVisible(true);
   }
