@@ -1,6 +1,5 @@
 import Phaser from 'phaser'
 import ScoreLabel from '../ui/ScoreLabel'
-import ItemSpawner from './ItemSpawner'
 import PlayerController from '../controllers/Player/PlayerController'
 import CupcakeController from '../controllers/CupcakeController'
 import BombController from '../controllers/BombController'
