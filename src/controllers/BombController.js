@@ -12,6 +12,16 @@ export default class BombController {
     this.createAnims();
   }
 
+  /**
+   * @param {Phaser.Scene} scene
+   */
+  static preloadAssets(scene){
+    scene.load.spritesheet(BombController.key, 'assets/img/bomb-sprite.png', {
+      frameWidth: 41,
+      frameHeight: 41
+    });
+  }
+
   createAnims(){
     this.scene.anims.create({
 			key: 'bomb-alt',

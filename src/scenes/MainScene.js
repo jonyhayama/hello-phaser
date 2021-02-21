@@ -32,10 +32,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet(KEYS.BOMB, 'assets/img/bomb-sprite.png', {
-      frameWidth: 41,
-      frameHeight: 41
-    });
+    BombController.preloadAssets(this);
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
     CupcakeController.preloadAssets(this);
