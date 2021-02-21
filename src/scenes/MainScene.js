@@ -4,6 +4,7 @@ import PlayerController from '../controllers/Player/PlayerController'
 import CupcakeController from '../controllers/CupcakeController'
 import BombController from '../controllers/BombController'
 import StarController from '../controllers/StarController'
+import EnergyBarController from '../controllers/EnergyBarController'
 
 const KEYS = {
   GROUND: 'ground',
@@ -148,15 +149,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createPowerGauge() {
-    this.energyContainer = this.add.sprite(160, 575, "energycontainer");
-
-    let energyBar = this.add.sprite(this.energyContainer.x + 23, this.energyContainer.y, "energybar");
-
-    this.energyMask = this.add.sprite(energyBar.x, energyBar.y, "energybar");
-    this.energyMask.x = -this.energyMask.displayWidth;
-    this.energyMask.visible = false;
-
-    energyBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.energyMask);
+    this.energyBar = new EnergyBarController(160, 575, this);
   }
 
   collectStar(player, star){
@@ -168,13 +161,11 @@ export default class MainScene extends Phaser.Scene {
 
     this.bombs.turnIntoCandy();
 
-    this.energyMask.x = this.energyContainer.x + 23;
+    this.energyBar.fill();
     
     this.player.super(10, () => {
-      let stepLengh = this.energyMask.displayWidth / 10;
-      this.energyMask.x -= stepLengh;
+      this.energyBar.drain(0.1);
     })
-    
   }
 
   collectCupcake(player, cupcake){
