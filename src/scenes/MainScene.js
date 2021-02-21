@@ -36,7 +36,7 @@ export default class MainScene extends Phaser.Scene {
     this.load.image(KEYS.GROUND, 'assets/img/platform.png');
     this.load.image('sky', 'assets/img/sky.png');
     CupcakeController.preloadAssets(this);
-    this.load.image(KEYS.STAR, 'assets/img/star.png');
+    StarController.preloadAssets(this);
 
     this.load.image("energycontainer", "assets/img/energycontainer.png");
     this.load.image("energybar", "assets/img/energybar.png");

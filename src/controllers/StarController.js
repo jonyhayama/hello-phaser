@@ -10,4 +10,11 @@ export default class StarController {
     this.scene = scene;
     this.spawner = new ItemSpawner(this.scene, StarController.key, 0.95);
   }
+
+  /**
+   * @param {Phaser.Scene} scene
+   */
+  static preloadAssets(scene){
+    scene.load.image(StarController.key, 'assets/img/star.png');
+  }
 }
