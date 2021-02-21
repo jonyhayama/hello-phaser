@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import PlayerController from '../controllers/Player/PlayerController'
+import PlayerController from '../controllers/PlayerController'
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {

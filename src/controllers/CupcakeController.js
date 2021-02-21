@@ -6,7 +6,6 @@ export default class CupcakeController {
    */
   constructor(scene) {
     this.scene = scene;
-    console.log(CupcakeController.key);
     this.group = this.scene.physics.add.group({
       key: CupcakeController.key,
       repeat: 11,

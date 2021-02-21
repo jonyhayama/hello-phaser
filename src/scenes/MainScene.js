@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import ScoreLabel from '../ui/ScoreLabel'
-import PlayerController from '../controllers/Player/PlayerController'
+import PlayerController from '../controllers/PlayerController'
 import CupcakeController from '../controllers/CupcakeController'
 import BombController from '../controllers/BombController'
 import StarController from '../controllers/StarController'
