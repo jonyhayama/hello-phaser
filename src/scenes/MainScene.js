@@ -21,8 +21,6 @@ export default class MainScene extends Phaser.Scene {
     this.cupcakes = undefined
     this.currentScore = 0;
     this.hiScore = Math.max( JSON.parse( localStorage.getItem('@helloPhaser/MainScene/hiScore') ), 0 );
-    this.superStar = 10;
-    this.superStarInterval = null;
     this.playerPlatformCollider = undefined;
     this.playerBombsCollider = undefined;
     this.playerCupcakesOverlap = undefined;
@@ -164,28 +162,18 @@ export default class MainScene extends Phaser.Scene {
   collectStar(player, star){
     star.destroy();
 
-    if( this.player.tween.isPlaying() ){
+    if( this.player.isSuper() ){
       return;
     }
 
     this.bombs.turnIntoCandy();
 
-    this.superStar = 10;
     this.energyMask.x = this.energyContainer.x + 23;
     
-    this.player.tween.play();
-    this.superStarInterval = setInterval(() => {
-      if( this.superStar > 0 ){
-        let stepLengh = this.energyMask.displayWidth / 10;
-        this.superStar -= 1;
-        this.energyMask.x -= stepLengh;
-        return;
-      }
-
-      this.superStar = 0;
-      this.player.tween.stop();
-      clearInterval(this.superStarInterval);
-    }, 1000);
+    this.player.super(10, () => {
+      let stepLengh = this.energyMask.displayWidth / 10;
+      this.energyMask.x -= stepLengh;
+    })
     
   }
 

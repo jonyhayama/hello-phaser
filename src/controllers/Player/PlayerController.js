@@ -175,4 +175,24 @@ export default class PlayerController {
     player.body.stop();
     player.body.allowGravity = false;
   }
+
+  super(time = 10, onStep = (step) => {}){    
+    this.superCounter = time;
+    this.tween.play();
+    this.superInterval = setInterval(() => {
+      if( this.superCounter > 0 ){
+        onStep(this.superCounter);
+        this.superCounter -= 1;
+        return;
+      }
+
+      this.superCounter = 0;
+      this.tween.stop();
+      clearInterval(this.superInterval);
+    }, 1000);
+  }
+
+  isSuper(){
+    return this.tween.isPlaying();
+  }
 }
