@@ -26,6 +26,8 @@
 	},
 	"dependencies": {
 		"deepmerge": "^4.2.2",
+		"global": "^4.4.0",
+		"parcel-bundler": "^1.12.5",
 		"phaser": "^3.50.1"
 	},
 	"parcelCleanPaths": [
